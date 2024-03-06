@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Address</title>
+    <style>
+        .nav-listed:hover{
+            background-color: rgba(50, 119, 140, 0.15);
+        }
+        .nav-listed{
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.41);
+            display: none;
+        }
+
+    </style>
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div class="overlay" id="overlay"></div>
+<!--breadcrumbs area start-->
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/profile">Profile</a></li>
+                        <li>Address</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="my-5 mx-3">
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5 class="my-3" th:text="${user.username}"></h5>
+                    <p class="text-muted mb-1" th:text="${user.email}"></p>
+                    <div class="d-flex justify-content-center mb-2">
+                        <a href="/user/profile/edit" class="btn btn-primary btn-sm ms-1">Edit</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-4 mb-lg-0">
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush rounded-3">
+                        <a th:href="@{/user/orders}">
+                            <li class="nav-listed d-flex justify-content-between align-items-center p-3">
+                                <h5>Orders</h5>
+                            </li>
+                        </a>
+                        <a th:href="@{/user/address}">
+                            <li class="nav-listed d-flex justify-content-between align-items-center p-3">
+                                <h5>Address</h5>
+                            </li>
+                        </a>
+                        <a th:href="@{/user/wallet}">
+                            <li class="nav-listed d-flex justify-content-between align-items-center p-3">
+                                <h5>Wallet</h5>
+                            </li>
+                        </a>
+                        <a th:href="@{/user/wishlist}">
+                            <li class="nav-listed d-flex justify-content-between align-items-center p-3">
+                                <h5>Wishlist</h5>
+                            </li>
+                        </a>
+
+                        <li class=" d-flex justify-content-between align-items-center p-3">
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="btn btn-danger text-white">Logout</button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <h3 class="ml-3 mb-3">Address</h3>
+            <div th:if="${#lists.size(allAddress) < 2}">
+                <a class="btn btn-primary ml-3 mb-3" th:href="@{/user/address/add}">Add address</a>
+            </div>
+            <div class=" mb-4">
+                <div class="">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-6 mb-4" th:each="address : ${allAddress}">
+                                <div class="card mb-4 mb-md-0">
+                                    <div class="card-body shadow rounded">
+                                        <div class="w-100">
+                                            <p><span class="font-weight-bold">Name: </span><span th:text="${address.name}"></span></p>
+                                            <hr>
+                                            <p><span class="font-weight-bold">Mobile: </span><span th:text="${address.mobile}"></span></p>
+                                            <hr>
+                                            <p><span class="font-weight-bold">Address: </span><span th:text="${address.address}"></span></p>
+                                            <hr>
+                                            <p><span class="font-weight-bold">City: </span><span th:text="${address.city}"></span></p>
+                                            <hr>
+                                            <p><span class="font-weight-bold">State: </span><span th:text="${address.state}"></span></p>
+                                            <hr>
+                                            <p><span class="font-weight-bold">Pin: </span><span th:text="${address.pin}"></span></p>
+                                            <hr>
+                                        </div>
+                                        <a th:href="@{/user/address/edit/{id}(id=${address.id})}" class="btn btn-primary btn-sm">Edit</a>
+                                        <a th:href="@{/user/address/delete/{id}(id=${address.id})}" class="btn btn-danger btn-sm ml-2 deleteButton">Delete</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+
+<script>
+    function customConfirm(message) {
+        return new Promise((resolve) => {
+            // Show the overlay
+            document.getElementById('overlay').style.display = 'block';
+
+            const confirmContainer = document.createElement('div');
+            confirmContainer.style.zIndex = 1001;
+            confirmContainer.style.position = 'fixed';
+            confirmContainer.style.top = '50%';
+            confirmContainer.style.left = '50%';
+            confirmContainer.style.transform = 'translate(-50%, -50%)';
+            confirmContainer.style.background = '#f0f0f0'; // Light background color
+            confirmContainer.style.padding = '20px';
+            confirmContainer.style.borderRadius = '8px';
+            confirmContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messageElement.style.marginBottom = '15px'; // Add some spacing between message and buttons
+            confirmContainer.appendChild(messageElement);
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'space-between';
+
+            const okButton = document.createElement('button');
+            okButton.textContent = 'OK';
+            okButton.style.padding = '8px 15px';
+            okButton.style.backgroundColor = '#28a745'; // Green color for OK button
+            okButton.style.color = '#fff'; // White text color
+            okButton.style.border = 'none';
+            okButton.style.borderRadius = '4px';
+            buttonContainer.appendChild(okButton);
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.padding = '8px 15px';
+            cancelButton.style.backgroundColor = '#dc3545'; // Red color for Cancel button
+            cancelButton.style.color = '#fff'; // White text color
+            cancelButton.style.border = 'none';
+            cancelButton.style.borderRadius = '4px';
+            buttonContainer.appendChild(cancelButton);
+
+            confirmContainer.appendChild(buttonContainer);
+
+            // Close the overlay when the user clicks OK or Cancel
+            const closeOverlay = () => {
+                document.body.removeChild(confirmContainer);
+                document.getElementById('overlay').style.display = 'none';
+            };
+
+            okButton.addEventListener('click', () => {
+                closeOverlay();
+                resolve(true);
+            });
+
+            cancelButton.addEventListener('click', () => {
+                closeOverlay();
+                resolve(false);
+            });
+
+            document.body.appendChild(confirmContainer);
+        });
+    }
+
+
+    // Use class for delete links
+    document.querySelectorAll('.deleteButton').forEach(function (button) {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault(); // Prevent the default link behavior
+
+            const result = await customConfirm('Do you want to proceed?');
+            if (result) {
+                // If the user clicks OK, navigate to the link
+                window.location.href = event.target.getAttribute('href');
+            }
+            // If the user clicks Cancel, do nothing
+        });
+    });
+</script>
+
+<!--<div th:replace="user/fragments/shipping_details :: shipping_details"></div>-->
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>

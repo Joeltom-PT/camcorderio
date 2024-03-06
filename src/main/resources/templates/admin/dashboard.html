@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css"  rel="stylesheet" />
+</head>
+<body>
+
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+
+<div class="p-4 sm:ml-64">
+    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <a href="/admin/users">
+                <div class="flex items-center justify-center h-24 shadow rounded bg-blue-50 dark:bg-blue-800">
+                    <p class="text-2xl text-blue-400 font-bold dark:text-blue-500">
+                        Users
+                    </p>
+                </div>
+            </a>
+            <a href="/admin/products">
+            <div class="flex items-center justify-center h-24 shadow rounded bg-purple-50 dark:bg-purple-800">
+                <p class="text-2xl text-purple-400 font-bold dark:text-purple-500">
+                    Product
+                </p>
+            </div>
+            </a>
+            <a href="/admin/categories">
+            <div class="flex items-center justify-center h-24 shadow rounded bg-teal-50 dark:bg-teal-800">
+                <p class="text-2xl text-green-400 font-bold dark:text-green-500">
+                   Categories
+                </p>
+            </div>
+            </a>
+            <a href="/admin/brands">
+                <div class="flex items-center justify-center h-24 shadow rounded bg-pink-50 dark:bg-pink-800">
+                    <p class="text-2xl text-pink-400 font-bold dark:text-pink-500">
+                        Brands
+                    </p>
+                </div>
+            </a>
+            <a href="/admin/orders">
+                <div class="flex items-center justify-center h-24 shadow rounded bg-indigo-50 dark:bg-indigo-800">
+                    <p class="text-2xl text-indigo-400 font-bold dark:text-indigo-500">
+                        Orders
+                    </p>
+                </div>
+            </a>
+            <a href="/admin/coupons">
+                <div class="flex items-center justify-center h-24 shadow rounded bg-orange-50 dark:bg-orange-800">
+                    <p class="text-2xl text-pink-400 font-bold dark:text-pink-500">
+                        Coupons
+                    </p>
+                </div>
+            </a>
+            <a href="/admin/banner">
+                <div class="flex items-center justify-center h-24 shadow rounded bg-purple-50 dark:bg-purple-800">
+                    <p class="text-2xl text-purple-400 font-bold dark:text-purple-500">
+                        Banner
+                    </p>
+                </div>
+              </a>
+            <a href="/admin/return">
+                <div class="flex items-center justify-center h-24 shadow rounded bg-pink-50 dark:bg-pink-800">
+                    <p class="text-2xl text-pink-400 font-bold dark:text-pink-500">
+                       Return
+                    </p>
+                </div>
+            </a>
+            <a href="/admin/offer/brand">
+                <div class="flex items-center justify-center h-24 shadow rounded bg-indigo-50 dark:bg-indigo-800">
+                    <p class="text-2xl text-indigo-400 font-bold dark:text-indigo-500">
+                       Brand Offer
+                    </p>
+                </div>
+            </a>
+            <a href="/admin/offer/product">
+                <div class="flex items-center justify-center h-24 shadow rounded bg-orange-50 dark:bg-orange-800">
+                    <p class="text-2xl text-pink-400 font-bold dark:text-pink-500">
+                        Product Offer
+                    </p>
+                </div>
+            </a>
+            </div>
+
+          <div class="grid grid-cols-1 gap-4 mb-4">
+              <div class="relative overflow-x-auto mt-2 mb-2 shadow-lg">
+                  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                      <caption class="text-sm text-gray-700 fa-underline uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">Top Products</caption>
+                      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                      <tr>
+                          <th scope="col" class="px-6 py-3">
+                              Product name
+                          </th>
+                          <th scope="col" class="px-6 py-3">
+                              Image
+                          </th>
+                          <th scope="col" class="px-6 py-3">
+                              Sales
+                          </th>
+                          <th scope="col" class="px-6 py-3">
+                              Price
+                          </th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr class="bg-white dark:bg-gray-800" th:each="product : ${products}">
+                          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                              <span th:text="${#strings.substring(product.name, 0, 75)}"></span><span>..more</span>
+                          </th>
+                          <td class="px-6 py-4">
+                              <img th:src="${product.imagesPath.get(0)}" width="50px" height="50px" alt="">
+                          </td>
+                          <td class="px-6 py-4" th:text="${product.totalSold}">
+                          </td>
+                          <td class="px-6 py-4" th:text="${product.price}">
+                          </td>
+                      </tr>
+                      </tbody>
+                  </table>
+              </div>
+
+           <div class="grid grid-cols-2 gap-4 mb-4">
+               <div class="relative overflow-x-auto mt-2 mb-2 shadow-lg">
+                   <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                       <caption class="text-sm text-gray-700 fa-underline uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">Top Categories</caption>
+                       <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                       <tr>
+                           <th scope="col" class="px-6 py-3">
+                               Category name
+                           </th>
+                           <th scope="col" class="px-6 py-3">
+                               Sales
+                           </th>
+                       </tr>
+                       </thead>
+                       <tbody>
+                       <tr class="bg-white dark:bg-gray-800" th:each="category : ${categories}">
+                           <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                               <span th:text="${category.categoryName}"></span>
+                           </th>
+                           <td class="px-6 py-4" th:text="${category.sales}">
+                           </td>
+                       </tr>
+                       </tbody>
+                   </table>
+               </div>
+               <div class="relative overflow-x-auto mt-2 mb-2 shadow-lg">
+                   <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                       <caption class="text-xs text-gray-700 fa-underline uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">Top Brands</caption>
+                       <thead class="text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                       <tr>
+                           <th scope="col" class="px-6 py-3">
+                               Brand name
+                           </th>
+                           <th scope="col" class="px-6 py-3">
+                               Sales
+                           </th>
+                       </tr>
+                       </thead>
+                       <tbody>
+                       <tr class="bg-white dark:bg-gray-800" th:each="brand : ${brands}">
+                           <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                               <span th:text="${brand.brandName}"></span>
+                           </th>
+                           <td class="px-6 py-4" th:text="${brand.sales}">
+                           </td>
+                       </tr>
+                       </tbody>
+                   </table>
+               </div>
+            </div>
+          </div>
+          </div>
+        </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Products</title>
+    <style>
+        .image-list{
+            display: flex;
+        }
+        .image-list li{
+            margin: 3px;
+        }
+        #big2,#big3{
+            display: none;
+        }
+        .add-to-cart-btn{
+            border: 0;
+            font-size: 16px;
+            margin-left: 20px;
+            background: #1D1678;
+            height: 42px;
+            line-height: 42px;
+            text-transform: capitalize;
+            min-width: 270px;
+            box-shadow: none;
+            display: inline-block;
+            padding: 0 22px;
+            border-radius: 3px;
+            text-align: center;
+        }
+        .btn-white-for-add{
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+
+<!--breadcrumbs area start-->
+
+<input type="hidden" id="product-input" th:value="${product.productId}">
+
+
+<!--product details start-->
+<div class="product_details mt-60 mb-60">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-6">
+                <div class="product-details-tab">
+                    <div id="img-1" class="zoomWrapper single-zoom shadow rounded-sm">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <a>
+                                        <div th:each="image, iterStat : ${product.imagesPath}" th:if="${iterStat.index < 3}">
+                                            <img th:id="'big' + ${iterStat.index + 1}" th:src="${image}" data-zoom-image="${image}" alt="big-1" class="rounded-sm">
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="single-zoom-thumb">
+                        <div class="col-md-12">
+                            <div>
+                                <ul class="image-list">
+                                    <li th:each="image, iterStat : ${product.imagesPath}" th:if="${iterStat.index < 3}">
+                                        <img class="img-small" th:data-find-num="${iterStat.index + 1}" th:src="${image}" alt="">
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <div class="product_d_right">
+                    <form action="#">
+
+                        <h2 th:text="${product.name}"></h2>
+                        <h4> Brand : <span th:text="${product.brands.brandName}"></span></h4>
+<!--                        <div class=" product_ratting">-->
+<!--                            <ul>-->
+<!--                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+<!--                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+<!--                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+<!--                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+<!--                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+<!--                                <li class="review"><a href="#"> (250 reviews) </a></li>-->
+<!--                            </ul>-->
+
+<!--                        </div>-->
+                        <div class="price_box">
+                            <div class="price_box">
+                                <span class="current_price">&#8377;
+                                <span th:if="${product.offerAmount}">
+                                    <span th:text="${product.price - product.offerAmount}"></span>
+                                </span>
+                                <span th:unless="${product.offerAmount}">
+                                    <span th:text="${product.price}"></span>
+                                </span>
+                                </span>
+                                <span th:if="${product.offerAmount}">
+                                    <span class="old_price text-danger">&#8377;<del th:text="${product.price}"></del></span>
+                                </span>
+                            </div>
+
+
+                        </div>
+                        <div class="product_desc">
+                            <ul>
+                                <th:block th:if="${product.stock > 0}">
+                                    <li> <span th:text="${product.stock}"></span> items in Stock</li>
+                                </th:block>
+                                <th:block th:unless="${product.stock > 0}">
+                                    <p class="text-danger font-weight-bolder" style="line-height: 2px;">No stock available</p>
+                                </th:block>
+                                <li>Free delivery available*</li>
+                                <!--                                <li>Sale 30% Off Use Code : 'Drophut'</li>-->
+                            </ul>
+                            <!--                                    <p >eget velit. Donec ac tempus ante. Fusce ultricies massa massa. Fusce aliquam, purus eget sagittis vulputate, sapien libero hendrerit est, sed commodo augue nisi non neque. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempor, lorem et placerat vestibulum, metus nisi posuere nisl, in </p>-->
+                        </div>
+                        <div class="product_variant color">
+                            <h3>Available Options</h3>
+                            <!--                                    <label>color</label>-->
+                            <!--                                    <ul>-->
+                            <!--                                        <li class="color1"><a href="#"></a></li>-->
+                            <!--                                        <li class="color2"><a href="#"></a></li>-->
+                            <!--                                        <li class="color3"><a href="#"></a></li>-->
+                            <!--                                        <li class="color4"><a href="#"></a></li>-->
+                            <!--                                    </ul>-->
+                        </div>
+                        <div class="product_variant quantity">
+                         <span th:if="${user}">
+                            <span th:if="${inWishlist == true}">
+                                <button class="button" type="button" onclick="removeFromWishlist('${product.productId}', '${user.email}')">Remove from Wishlist</button>
+                            </span>
+                            <span th:unless="${inWishlist == true}">
+                            <button class="button" type="button" onclick="addToWishlist('${product.productId}', '${user.email}')">Add to Wishlist</button>
+                            </span>
+                            </span>
+                            <span th:unless="${user}">
+                                <a class="button add-to-cart-btn" type="submit" href="/login">Add to Wishlist</a>
+                         </span>
+
+                            <span th:if="${user != null and user.role == 'USER'}">
+                            <a class="button add-to-cart-btn" type="submit" th:data-product-id="${product.productId}">
+                                <span class="btn-white-for-add">Add to cart</span>
+                            </a>
+                           </span>
+                            <span th:unless="${user != null and user.role == 'USER'}">
+                             <a href="/login" class="button add-to-cart-btn" type="submit">
+                                     <span class="btn-white-for-add">Add to cart</span>
+                             </a>
+                          </span>
+
+                        </div>
+                        <div class=" product_d_action">
+
+                        </div>
+                        <div class="product_meta">
+                            <span>Category: <a href="#" th:text="${product.categories.categoryName}"></a></span>
+                        </div>
+                    </form>
+                    <div class="priduct_social">
+                        <ul>
+                            <li><a class="facebook" href="#" title="facebook"><i class="fa fa-facebook"></i> Like</a></li>
+                            <li><a class="twitter" href="#" title="twitter"><i class="fa fa-twitter"></i> tweet</a></li>
+                            <li><a class="pinterest" href="#" title="pinterest"><i class="fa fa-pinterest"></i> save</a></li>
+                            <li><a class="google-plus" href="#" title="google +"><i class="fa fa-google-plus"></i> share</a></li>
+                            <li><a class="linkedin" href="#" title="linkedin"><i class="fa fa-linkedin"></i> linked</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--product info start-->
+<div class="product_d_info mb-60">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="product_d_inner">
+                    <!--                            <div class="product_info_button">-->
+                    <!--                                <ul class="nav" role="tablist">-->
+                    <!--                                    <li >-->
+                    <!--                                        <a class="active" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="false">Description</a>-->
+                    <!--                                    </li>-->
+                    <!--                                    <li>-->
+                    <!--                                        <a data-toggle="tab" href="#sheet" role="tab" aria-controls="sheet" aria-selected="false">Specification</a>-->
+                    <!--                                    </li>-->
+                    <!--                                    <li>-->
+                    <!--                                        <a data-toggle="tab" href="#reviews" role="tab" aria-controls="reviews" aria-selected="false">Reviews (1)</a>-->
+                    <!--                                    </li>-->
+                    <!--                                </ul>-->
+                    <!--                            </div>-->
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="info" role="tabpanel" >
+                            <div class="product_info_content">
+                                <h3>Product Description</h3>
+                                <p th:utext="${product.description}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="tab-content">
+                            <div class="tab-pane fade show active"  role="tabpanel" >
+                                <div class="product_info_content">
+                                    <h3>Specifications</h3>
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-6">
+                                                <p th:utext="${product.specifications}"></p>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <!--                                <div class="tab-pane fade" id="sheet" role="tabpanel" >-->
+                            <!--                                    <div class="product_d_table">-->
+                            <!--                                        <form action="#">-->
+                            <!--                                            <table>-->
+                            <!--                                                <tbody>-->
+                            <!--                                                <tr>-->
+                            <!--                                                    <td class="first_child">Compositions</td>-->
+                            <!--                                                    <td>Polyester</td>-->
+                            <!--                                                </tr>-->
+                            <!--                                                <tr>-->
+                            <!--                                                    <td class="first_child">Styles</td>-->
+                            <!--                                                    <td>Girly</td>-->
+                            <!--                                                </tr>-->
+                            <!--                                                <tr>-->
+                            <!--                                                    <td class="first_child">Properties</td>-->
+                            <!--                                                    <td>Short Dress</td>-->
+                            <!--                                                </tr>-->
+                            <!--                                                </tbody>-->
+                            <!--                                            </table>-->
+                            <!--                                        </form>-->
+                            <!--                                    </div>-->
+                            <!--                                    <div class="product_info_content">-->
+                            <!--                                        <p>Fashion has been creating well-designed collections since 2010. The brand offers feminine designs delivering stylish separates and statement dresses which have since evolved into a full ready-to-wear collection in which every item is a vital part of a woman's wardrobe. The result? Cool, easy, chic looks with youthful elegance and unmistakable signature style. All the beautiful pieces are made in Italy and manufactured with the greatest attention. Now Fashion extends to a range of accessories including shoes, hats, belts and more!</p>-->
+                            <!--                                    </div>-->
+                            <!--                                </div>-->
+
+                            <!--&lt;!&ndash;                                <div class="tab-pane fade" id="reviews" role="tabpanel" >&ndash;&gt;-->
+                            <!--                                    <div class="reviews_wrapper">-->
+                            <!--                                        <h2>1 review for Donec eu furniture</h2>-->
+                            <!--                                        <div class="reviews_comment_box">-->
+                            <!--                                            <div class="comment_thmb">-->
+                            <!--                                                <img src="assets/img/blog/comment2.jpg" alt="">-->
+                            <!--                                            </div>-->
+                            <!--                                            <div class="comment_text">-->
+                            <!--                                                <div class="reviews_meta">-->
+                            <!--                                                    <div class="star_rating">-->
+                            <!--                                                        <ul>-->
+                            <!--                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>-->
+                            <!--                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>-->
+                            <!--                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>-->
+                            <!--                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>-->
+                            <!--                                                            <li><a href="#"><i class="ion-ios-star"></i></a></li>-->
+                            <!--                                                        </ul>-->
+                            <!--                                                    </div>-->
+                            <!--                                                    <p><strong>admin </strong>- September 12, 2018</p>-->
+                            <!--                                                    <span>roadthemes</span>-->
+                            <!--                                                </div>-->
+                            <!--                                            </div>-->
+
+                            <!--                                        </div>-->
+                            <!--                                        <div class="comment_title">-->
+                            <!--                                            <h2>Add a review </h2>-->
+                            <!--                                            <p>Your email address will not be published.  Required fields are marked </p>-->
+                            <!--                                        </div>-->
+                            <!--                                        <div class="product_ratting mb-10">-->
+                            <!--                                            <h3>Your rating</h3>-->
+                            <!--                                            <ul>-->
+                            <!--                                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+                            <!--                                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+                            <!--                                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+                            <!--                                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+                            <!--                                                <li><a href="#"><i class="fa fa-star"></i></a></li>-->
+                            <!--                                            </ul>-->
+                            <!--                                        </div>-->
+                            <!--                                        <div class="product_review_form">-->
+                            <!--                                            <form action="#">-->
+                            <!--                                                <div class="row">-->
+                            <!--                                                    <div class="col-12">-->
+                            <!--                                                        <label for="review_comment">Your review </label>-->
+                            <!--                                                        <textarea name="comment" id="review_comment" ></textarea>-->
+                            <!--                                                    </div>-->
+                            <!--                                                    <div class="col-lg-6 col-md-6">-->
+                            <!--                                                        <label for="author">Name</label>-->
+                            <!--                                                        <input id="author"  type="text">-->
+
+                            <!--                                                    </div>-->
+                            <!--                                                    <div class="col-lg-6 col-md-6">-->
+                            <!--                                                        <label for="email">Email </label>-->
+                            <!--                                                        <input id="email"  type="text">-->
+                            <!--                                                    </div>-->
+                            <!--                                                </div>-->
+                            <!--                                                <button type="submit">Submit</button>-->
+                            <!--                                            </form>-->
+                            <!--                                        </div>-->
+                            <!--                                    </div>-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--product info end-->
+
+
+<script>
+    let elements = document.getElementsByClassName('img-small');
+
+    for (let i = 0; i < elements.length; i++) {
+        elements[i].addEventListener('click', function (event) {
+            let clickedElement = event.target;
+            let srcAttributeValue = clickedElement.getAttribute('data-find-num');
+
+            // Hide all big elements
+            for (let j = 1; j <= 3; j++) {
+                document.getElementById(`big${j}`).style.display = 'none';
+            }
+
+            // Display the clicked big element
+            document.getElementById(`big${srcAttributeValue}`).style.display = 'block';
+        });
+    }
+
+</script>
+
+<!-- Add to Wishlist function -->
+<script>
+
+    let productId = document.getElementById('product-input').value;
+    function addToWishlist() {
+        let productId = document.getElementById('product-input').value;
+        $.ajax({
+            type: "GET",
+            url: "/wishlist/add/" + productId,
+            success: function (response) {
+                console.log(response);
+                location.reload();
+            },
+            error: function (error) {
+                console.error(error.responseText);
+                // Handle error, e.g., show an error message
+            }
+        });
+    }
+</script>
+
+<!-- Remove from Wishlist function -->
+<script>
+    function removeFromWishlist() {
+        let productId = document.getElementById('product-input').value;
+        $.ajax({
+            type: "GET",
+            url: "/wishlist/remove/" + productId,
+            success: function (response) {
+                console.log(response);
+                location.reload();
+                // Handle success, e.g., show a success message
+            },
+            error: function (error) {
+                console.error(error.responseText);
+                // Handle error, e.g., show an error message
+            }
+        });
+    }
+</script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Add to cart button click event
+        document.querySelectorAll('.add-to-cart-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                // Get product information from data attributes
+                let productId = this.getAttribute('data-product-id');
+
+
+                console.log(productId)
+                $.ajax({
+                    url: `/add/to/cart?productId=${productId}`,      // The URL to which the request is sent
+                    type: 'get',               // The HTTP method to use for the request (e.g., 'GET', 'POST')
+                    dataType: 'json',         // The type of data expected from the server ('json', 'xml', 'html', or 'text')
+                    // Data to be sent to the server. It can be in the form of a query string or an object
+                    success: function (response) {
+                        console.log("successful");
+                        console.log(response);
+                    }
+                });
+
+                // Rest of your code...
+            });
+        });
+    });
+</script>
+
+
+<div th:replace="user/fragments/shipping_details :: shipping_details"></div>
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>

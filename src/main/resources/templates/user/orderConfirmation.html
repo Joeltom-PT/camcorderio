@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Order Confirmation</title>
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="text-center">
+                <h2>Order Confirmation</h2>
+                <p>Your order details are as follows:</p>
+            </div>
+
+            <!-- Displaying Address Details -->
+            <div th:each="address, addressIndex : ${allAddress}">
+                <div class="card mb-4">
+                    <div class="card-body shadow rounded">
+                        <div>
+                            <p><span class="font-weight-bold">Name: </span><span th:text="${address.name}"></span></p>
+                            <p><span class="font-weight-bold">Mobile: </span><span th:text="${address.mobile}"></span></p>
+                            <p><span class="font-weight-bold">Address: </span><span th:text="${address.address}"></span></p>
+                            <p><span class="font-weight-bold">City: </span><span th:text="${address.city}"></span></p>
+                            <p><span class="font-weight-bold">State: </span><span th:text="${address.state}"></span></p>
+                            <p><span class="font-weight-bold">Pin: </span><span th:text="${address.pin}"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Displaying Order Details -->
+            <div class="order_table table-responsive">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="cartProduct : ${cartedProducts}">
+                        <td th:text="${cartProduct.productName}"></td>
+                        <td th:text="${cartProduct.quantity}"></td>
+                        <td th:text="${'&#8377; ' + (cartProduct.quantity * (cartProduct.productPrice - cartProduct.offerAmount))}"></td>
+                    </tr>
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th colspan="2">Cart Subtotal</th>
+                        <td><strong>&#8377; <span th:text="${cart.totalPrice}"></span></strong></td>
+                    </tr>
+                    <tr>
+                        <th colspan="2" th:if="${cart.totalPrice gt 1000}">Delivery Charge</th>
+                        <td><strong>&#8377; <span>40</span></strong></td>
+                    </tr>
+                    <tr th:if="${coupon != null and coupon.amount != null}">
+                        <th colspan="2">Coupon Discount</th>
+                        <th>&#8377; <span th:text="${coupon.amount}"></span></th>
+                    </tr>
+                    <tr class="order_total">
+                        <th colspan="2">Order Total</th>
+                        <td th:if="${coupon != null and coupon.amount != null}">
+                            <strong>&#8377; <span th:if="${cart.totalPrice gt 1000}" th:text="${cart.totalPrice - coupon.amount + 40}"></span>
+                                <span th:unless="${cart.totalPrice gt 1000}" th:text="${cart.totalPrice - coupon.amount}"></span>
+                            </strong>
+                        </td>
+                        <td th:unless="${coupon != null and coupon.amount != null}">
+                            <strong>&#8377;
+                                <span th:if="${cart.totalPrice gt 1000}" th:text="${cart.totalPrice + 40}"></span>
+                                <span th:unless="${cart.totalPrice gt 1000}" th:text="${cart.totalPrice}"></span>
+                            </strong>
+                        </td>
+                    </tr>
+
+
+                    </tfoot>
+                </table>
+            </div>
+
+            <!-- Order Confirmation Message -->
+            <div class="text-center pb-5">
+                <a href="/user/orderConfirmation/Complete" class="btn-primary btn-lg">Conform Order</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+<script th:inline="javascript">
+    /* Output the value of hasCoupon as a JavaScript variable */
+    var hasCoupon = /*[[${hasCoupon}]]*/ false;
+    console.log(hasCoupon);
+    console.log("hello");
+</script>
+</body>
+</html>

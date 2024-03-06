@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css"  rel="stylesheet" />
+</head>
+<body>
+
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+
+<div class="p-4 sm:ml-64">
+    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
+
+        <a type="button" th:href="@{/admin/offer/product/add}" class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">Add Offer</a>
+        <br> <br>
+        <div class="relative overflow-x-auto">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">Image</th>
+                    <th scope="col" class="px-6 py-3">Product Name</th>
+                    <th scope="col" class="px-6 py-3">Price</th>
+                    <th scope="col" class="px-6 py-3">Offer</th>
+                    <th scope="col" class="px-6 py-3">End Time</th>
+                    <th scope="col" class="px-6 py-3">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="offer : ${offers}" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                    <td class="px-6 py-4">
+                        <img th:src="${offer.imagePath}" width="100px" height="100px">
+                    </td>
+                    <td class="px-6 py-4" th:text="${offer.name}"></td>
+                    <td class="px-6 py-4" th:text="${offer.price}"></td>
+                    <td class="px-6 py-4" th:text="${offer.offerDiscount}"></td>
+                    <td class="px-6 py-4" th:text="${offer.offerExpireDateTime}"></td>
+                    <td class="px-6 py-4">
+                        <a class="font-bold text-blue-600 underline mr-2" th:href="@{/admin/offer/product/edit/{id}(id=${offer.id})}">Edit</a>
+                        <a class="font-bold text-red-600 underline deleteButton" onclick="deleteOffer(this.getAttribute('data-productId'))" th:attr="data-productId=${offer.id}">Delete</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <nav aria-label="Page navigation example" th:if="${offers.totalPages > 1}">
+            <ul class="inline-flex -space-x-px text-sm">
+                <li th:if="${offers.hasPrevious}">
+                    <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" th:href="@{'/admin/offers?page=' + ${offers.number - 1}}">Previous</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, offers.totalPages - 1)}"
+                    th:class="${offers.number == i} ? 'page-item active' : 'page-item'">
+                    <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" th:href="@{'/admin/offers?page=' + ${i}}" th:text="${i + 1}"></a>
+                </li>
+                <li th:if="${offers.hasNext}">
+                    <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 rounded-e-lg hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" th:href="@{'/admin/offers?page=' + ${offers.number + 1}}">Next</a>
+                </li>
+            </ul>
+        </nav>
+
+    </div>
+</div>
+
+
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<script th:inline="javascript">
+    function deleteOffer(offerId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to revert this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: 'GET',
+                    url: '/admin/offer/product/delete/'+offerId,
+                    success: function(response) {
+                        setTimeout(function() {
+                            location.reload();
+                        }, 400);
+
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Error deleting the offer',
+                            icon: 'warning',
+                        })
+                    }
+                });
+            }
+        });
+    }
+</script>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

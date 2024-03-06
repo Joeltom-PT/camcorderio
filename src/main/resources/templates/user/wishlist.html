@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Wishlist</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Graduate&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li>Wishlist</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div>
+
+    <section>
+        <div class="container my-5">
+            <header class="mb-4">
+                <h3>Wishlist</h3>
+            </header>
+            <div style="text-align: center;" th:if="${products.isEmpty()}">
+                <a href="\products" class="btn btn-custom-buy shadow-0 me-1 w-50 mt-2 mb-5">
+                    Add Items
+                </a>
+            </div>
+            <div class="row">
+                <!-- Assuming you are iterating through a list of products in your Thymeleaf template -->
+                <div class="col-sm-6 col-md-4 col-lg-3 d-flex" th:each="product : ${products}">
+                    <div class="card w-100 mb-3  shadow border-0">
+                        <!-- Replace the static image source with the dynamic image path from the product -->
+                        <a th:href="@{/product/{productId}(productId=${product.productId})}">
+                            <img th:src="*{product.imagesPath.get(0)}" class="card-img-top" style="aspect-ratio: 2 / 2"/>
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <hr>
+                            <!-- Use Thymeleaf expression to fetch product details -->
+                            <h5 class="card-title" th:text="${product.name}"></h5>
+                            <p class="card-text">&#x20B9; <span class="pro-price" th:text="${product.price}"></span></p>
+                            <div class="d-flex align-items-end pt-3 px-0 pb-0 mt-auto">
+                                <!--                                <a class="btn  px-2 pt-2 icon-hover">-->
+                                <!--                                    <img src="/assets/img/icon/wishlist1.svg" alt="">-->
+                                <!--                                </a>-->
+                            </div>
+                       <a class="btn btn-custom-buy shadow-0 me-1 w-100 text-white add-to-cart-btn" th:href="@{/product/{productId}(productId=${product.productId})}">View Product</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Add to cart button click event
+        document.querySelectorAll('.add-to-cart-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                // Get product information from data attributes
+                let productId = this.getAttribute('data-product-id');
+
+
+                console.log(productId)
+                $.ajax({
+                    url: `/add/to/cart?productId=${productId}`,      // The URL to which the request is sent
+                    type: 'get',               // The HTTP method to use for the request (e.g., 'GET', 'POST')
+                    dataType: 'json',         // The type of data expected from the server ('json', 'xml', 'html', or 'text')
+                    // Data to be sent to the server. It can be in the form of a query string or an object
+                    success: function (response) {
+                        console.log("successful");
+                        console.log(response);
+                    }
+                });
+
+                // Rest of your code...
+            });
+        });
+    });
+</script>
+
+
+<div th:replace="user/fragments/shipping_details :: shipping_details"></div>
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Address</title>
+    <style>
+        .nav-listed:hover{
+            background-color: rgba(50, 119, 140, 0.15);
+        }
+        .nav-listed{
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.41);
+            display: none;
+        }
+
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div class="overlay" id="overlay"></div>
+<!--breadcrumbs area start-->
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/profile">Profile</a></li>
+                        <li>Orders</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="my-5 mx-3">
+    <div class="row">
+        <div class="col-lg-12">
+            <h3 class="ml-3 mb-3">Orders</h3>
+            <div class=" mb-4">
+                <div class="">
+                    <!--shopping cart area start -->
+                    <div class="shopping_cart_area mt-60">
+                        <div class="container">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div>
+
+                                            <div th:each="order : ${orders}" class="order mb-4">
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="container">
+                                                            <div class="row">
+                                                                <div class="col-sm-12 col-md-4">
+                                                                    <h4 class="card-title" style="color: #4CAF50; font-weight: bold; text-shadow: 0px 0px .5px black;">Order Details</h4>
+                                                                    <p class="card-text" style="font-weight: bold;">Order ID: <span style="color: #474477" th:text="${order.orderId}"></span></p>
+                                                                    <p class="card-text" style="font-weight: bold;">Order Date: <span style="color: #474477" th:text="${order.orderDate}"></span></p>
+                                                                    <p class="card-text" style="font-weight: bold;">Total Amount: ₹<span style="color: #474477" th:text="${order.totalAmount}"></span></p>
+
+                                                                    <h4 class="card-title" style="color: #007BFF; font-weight: bold;text-shadow: 0px 0px .5px black;">Delivery Information</h4>
+                                                                    <p class="card-text" style="font-weight: bold;">Address: <span style="color: #474477" th:text="${order.address}"></span></p>
+                                                                    <p class="card-text" style="font-weight: bold;">Payment Status: <span style="color: #474477" th:text="${order.paymentStatus}"></span></p>
+
+                                                                    <h4 class="card-title" style="color: #e1a800; font-weight: bold;text-shadow: 0px 0px .5px black;">Status</h4>
+                                                                    <p class="card-text" style="font-weight: bold;">Order Status: <span style="color: #474477" th:text="${order.orderStatus}"></span></p>
+
+                                                                    <div th:if="${order.paymentStatus == 'Pending'}">
+                                                                        <a type="button" class="btn btn-primary" th:href="@{'/user/failed/order/payment/' + ${order.orderId}}">Pay now and place the order</a>
+                                                                        <a id="cancelOrderBtn" type="button" class="btn btn-danger" onclick="confirmCancelOrder(this.getAttribute('data-order-Id'))" th:data-order-Id="${order.orderId}">Cancel order</a>
+                                                                        <!--                                                                        <a type="button" class="btn btn-danger" th:href="@{'/user/failed/order/payment/cancel/' + ${order.orderId}}">Cancel order</a>-->
+                                                                    </div>
+
+
+                                                                </div>
+
+                                                                <div class="col-sm-12 col-md-8">
+                                                                    <h4 class="card-title">Order Items</h4>
+                                                                    <div class="cart_page table-responsive">
+                                                                        <table class="table">
+                                                                            <thead>
+                                                                            <tr>
+                                                                                <th>No</th>
+                                                                                <th>Image</th>
+                                                                                <th>Product</th>
+                                                                                <th>Quantity</th>
+                                                                            </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            <tr th:each="orderItem, iterStat : ${order.orderItems}">
+                                                                                <td th:text="${iterStat.count}"></td>
+                                                                                <td><img th:src="${orderItem.imageUrl}" style="height: 60px;width: 70px"></td>
+                                                                                <td th:text="${orderItem.productName}"></td>
+                                                                                <td th:text="${orderItem.quantity}"></td>
+                                                                            </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <a th:if="${order.paymentStatus != 'Pending'}" th:href="@{/user/orderDetails/{id}(id=${order.orderId})}" class="btn btn-custom-buy ml-3 mt-3">Track Order and More</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+<script>
+    function customConfirm(message) {
+        return new Promise((resolve) => {
+            // Show the overlay
+            document.getElementById('overlay').style.display = 'block';
+
+            const confirmContainer = document.createElement('div');
+            confirmContainer.style.zIndex = 1001;
+            confirmContainer.style.position = 'fixed';
+            confirmContainer.style.top = '50%';
+            confirmContainer.style.left = '50%';
+            confirmContainer.style.transform = 'translate(-50%, -50%)';
+            confirmContainer.style.background = '#f0f0f0'; // Light background color
+            confirmContainer.style.padding = '20px';
+            confirmContainer.style.borderRadius = '8px';
+            confirmContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messageElement.style.marginBottom = '15px'; // Add some spacing between message and buttons
+            confirmContainer.appendChild(messageElement);
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'space-between';
+
+            const okButton = document.createElement('button');
+            okButton.textContent = 'OK';
+            okButton.style.padding = '8px 15px';
+            okButton.style.backgroundColor = '#28a745'; // Green color for OK button
+            okButton.style.color = '#fff'; // White text color
+            okButton.style.border = 'none';
+            okButton.style.borderRadius = '4px';
+            buttonContainer.appendChild(okButton);
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.padding = '8px 15px';
+            cancelButton.style.backgroundColor = '#dc3545'; // Red color for Cancel button
+            cancelButton.style.color = '#fff'; // White text color
+            cancelButton.style.border = 'none';
+            cancelButton.style.borderRadius = '4px';
+            buttonContainer.appendChild(cancelButton);
+
+            confirmContainer.appendChild(buttonContainer);
+
+            // Close the overlay when the user clicks OK or Cancel
+            const closeOverlay = () => {
+                document.body.removeChild(confirmContainer);
+                document.getElementById('overlay').style.display = 'none';
+            };
+
+            okButton.addEventListener('click', () => {
+                closeOverlay();
+                resolve(true);
+            });
+
+            cancelButton.addEventListener('click', () => {
+                closeOverlay();
+                resolve(false);
+            });
+
+            document.body.appendChild(confirmContainer);
+        });
+    }
+
+
+    // Use class for delete links
+    document.querySelectorAll('.deleteButton').forEach(function (button) {
+        button.addEventListener('click', async (event) => {
+            event.preventDefault(); // Prevent the default link behavior
+
+            const result = await customConfirm('Do you want to proceed?');
+            if (result) {
+                // If the user clicks OK, navigate to the link
+                window.location.href = event.target.getAttribute('href');
+            }
+            // If the user clicks Cancel, do nothing
+        });
+    });
+</script>
+
+<script th:inline="javascript">
+    /* <![CDATA[ */
+    // Function to show SweetAlert confirmation
+    function confirmCancelOrder(orderId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // If user confirms, navigate to cancel URL
+                window.location.href = '/user/failed/order/payment/cancel/' + orderId;
+            }
+        });
+    }
+
+    // Attach click event listener to the cancel order button
+    document.getElementById('cancelOrderBtn').addEventListener('click', function() {
+        // Get the orderId from Thymeleaf expression
+        var orderId = /*[[${order.orderId}]]*/ '';
+        // Call the function to show confirmation
+        confirmCancelOrder(orderId);
+    });
+    /* ]]> */
+</script>
+
+<!--<div th:replace="user/fragments/shipping_details :: shipping_details"></div>-->
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>

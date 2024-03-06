@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Coupon</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+</head>
+<body>
+<center style="padding-top: 5vh">
+  <div class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+      <div th:if="${not #lists.isEmpty(errors)}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <strong class="font-bold">Errors:</strong>
+          <ul>
+              <li th:each="error : ${errors}" th:text="${error}"></li>
+          </ul>
+      </div>
+    <form class="p-4 md:p-5" th:action="@{/admin/coupons/edit/{id}(id=${coupon.id})}" th:object="${coupon}" method="post">
+    <div class="grid gap-4 mb-4 grid-cols-2">
+        <div class="col-span-2">
+          <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+          <input type="text" th:field="*{name}" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type coupon name">
+        </div>
+        <div class="col-span-2 sm:col-span-1">
+          <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Coupon Offer</label>
+          <input type="number" th:field="*{amount}" id="amount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter coupon offer amount">
+        </div>
+        <div class="col-span-2 sm:col-span-1">
+          <label for="minimumOrderAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Minimum Order Price</label>
+          <input type="number" th:field="*{minimumOrderAmount}" id="minimumOrderAmount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter minimum order price">
+        </div>
+        <div class="col-span-2">
+          <label for="editStartDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date</label>
+          <input type="date" th:field="*{startDate}" th:placeholder="*{startDate}" th:value="*{startDate}" id="editStartDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+        </div>
+        <div class="col-span-2">
+          <label for="editExpiryDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Expiry Date</label>
+          <input type="date" th:field="*{expiryDate}" th:placeholder="*{expiryDate}" th:value="*{expiryDate}" id="editExpiryDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+        </div>
+        <div class="col-span-2">
+          <label for="couponDescription" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Coupon Description</label>
+          <textarea id="couponDescription" th:field="*{couponDescription}" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write coupon description here"></textarea>
+        </div>
+      </div>
+      <button type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+        <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+        Add new Coupon
+      </button>
+    </form>
+  </div>
+</center>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+</body>
+</html>

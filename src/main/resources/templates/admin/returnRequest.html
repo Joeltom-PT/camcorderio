@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Return Request</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css"  rel="stylesheet" />
+</head>
+<body>
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+<div class="p-4 sm:ml-64 mt-30" style="margin-top: 60px">
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+
+        <div class="grid grid-cols-12 gap-4">
+
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">
+                            No
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                           Request Date
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Order Id
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            User Id
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Action
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="request, iterationStat : ${requests}" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                        <td th:text="${iterationStat.index + 1}"  class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        </td>
+                        <td th:text="${request.requestDate}" class="px-6 py-4 font-bold text-gray-900">
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="category-description font-medium text-gray-900" th:text="${request.getOrder().orderId}"></span>
+                        </td>
+                        <td th:text="${request.getUser().userId}" class="px-6 py-4 font-bold text-gray-900">
+                        </td>
+                        <td class="px-6 py-4">
+                            <a class="font-bold text-blue-600 underline mr-2" th:href="@{/admin/return/details/{id}(id=${request.returnRequestId})}">Details</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    function customConfirm(message) {
+        return new Promise((resolve) => {
+            const confirmContainer = document.createElement('div');
+            confirmContainer.style.position = 'fixed';
+            confirmContainer.style.top = '50%';
+            confirmContainer.style.left = '50%';
+            confirmContainer.style.transform = 'translate(-50%, -50%)';
+            confirmContainer.style.background = '#f0f0f0'; // Light background color
+            confirmContainer.style.padding = '20px';
+            confirmContainer.style.borderRadius = '8px';
+            confirmContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messageElement.style.marginBottom = '15px'; // Add some spacing between message and buttons
+            confirmContainer.appendChild(messageElement);
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'space-between';
+
+            const okButton = document.createElement('button');
+            okButton.textContent = 'OK';
+            okButton.style.padding = '8px 15px';
+            okButton.style.backgroundColor = '#28a745'; // Green color for OK button
+            okButton.style.color = '#fff'; // White text color
+            okButton.style.border = 'none';
+            okButton.style.borderRadius = '4px';
+            okButton.addEventListener('click', () => {
+                document.body.removeChild(confirmContainer);
+                resolve(true);
+            });
+            buttonContainer.appendChild(okButton);
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.padding = '8px 15px';
+            cancelButton.style.backgroundColor = '#dc3545'; // Red color for Cancel button
+            cancelButton.style.color = '#fff'; // White text color
+            cancelButton.style.border = 'none';
+            cancelButton.style.borderRadius = '4px';
+            cancelButton.addEventListener('click', () => {
+                document.body.removeChild(confirmContainer);
+                resolve(false);
+            });
+            buttonContainer.appendChild(cancelButton);
+
+            confirmContainer.appendChild(buttonContainer);
+
+            document.body.appendChild(confirmContainer);
+        });
+    }
+
+
+    // Attach the custom confirmation to the link
+    document.getElementById('myButton').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent the default link behavior
+
+        const result = await customConfirm('Do you want to proceed?');
+        if (result) {
+            // If the user clicks OK, navigate to the link
+            window.location.href = event.target.getAttribute('href');
+        }
+        // If the user clicks Cancel, do nothing
+    });
+    document.getElementById('myButton1').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent the default link behavior
+
+        const result = await customConfirm('Do you want to proceed?');
+        if (result) {
+            // If the user clicks OK, navigate to the link
+            window.location.href = event.target.getAttribute('href');
+        }
+        // If the user clicks Cancel, do nothing
+    });
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

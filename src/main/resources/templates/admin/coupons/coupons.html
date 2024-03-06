@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin - Coupon Management</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css"  rel="stylesheet" />
+  <style>
+    .error-ul {
+      list-style-type: none;
+    }
+
+    .error-li::before {
+      content: '\1F6C8';
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+
+  </style>
+</head>
+<body>
+
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+
+<div class="p-4 sm:ml-64">
+  <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
+
+
+
+    <!-- Modal toggle -->
+    <button data-modal-target="crud-modal" data-modal-toggle="crud-modal" class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" type="button">
+     Add Coupon
+    </button>
+
+    <div th:if="${errors}" id="alert-2" class="flex items-center p-4 mb-4 text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+      <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+      </svg>
+      <span class="sr-only">Info</span>
+      <div class="ms-3 text-sm font-medium">
+        <ul class="error-ul">
+          <li class="error-li" th:each="error : ${errors}" th:text="${error}"></li>
+        </ul>
+      </div>
+      <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-red-50 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-red-400 dark:hover:bg-gray-700" data-dismiss-target="#alert-2" aria-label="Close">
+        <span class="sr-only">Close</span>
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+        </svg>
+      </button>
+    </div>
+
+
+
+    <div th:if="${success}" id="alert-border-3" class="flex items-center p-4 mb-4 text-green-800 border-t-4 border-green-300 bg-green-50 dark:text-green-400 dark:bg-gray-800 dark:border-green-800" role="alert">
+      <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+      </svg>
+      <div class="ms-3 text-sm font-medium">
+      <span th:text="${success}"></span>
+      </div>
+      <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8 dark:bg-gray-800 dark:text-green-400 dark:hover:bg-gray-700"  data-dismiss-target="#alert-border-3" aria-label="Close">
+        <span class="sr-only">Dismiss</span>
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Main modal -->
+    <div id="crud-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+      <div class="relative p-4 w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+          <!-- Modal header -->
+          <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+              Create New Coupon
+            </h3>
+            <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="crud-modal">
+              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+              </svg>
+              <span class="sr-only">Close modal</span>
+            </button>
+          </div>
+          <!-- Modal body -->
+          <form class="p-4 md:p-5" th:action="@{/admin/add/coupon}" method="post">
+            <div class="grid gap-4 mb-4 grid-cols-2">
+              <div class="col-span-2">
+                <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Type coupon name" >
+              </div>
+              <div class="col-span-2 sm:col-span-1">
+                <label for="amount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Coupon Offer</label>
+                <input type="number" name="amount" id="amount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter coupon offer amount">
+              </div>
+              <div class="col-span-2 sm:col-span-1">
+                <label for="minimumOrderAmount" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Minimum Order Price</label>
+                <input type="number" name="minimumOrderAmount" id="minimumOrderAmount" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Enter minimum order price">
+              </div>
+              <div class="col-span-2">
+                <label for="editStartDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Start Date</label>
+                <input type="date" name="startDate" id="editStartDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+              </div>
+              <div class="col-span-2">
+                <label for="editExpiryDate" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Expiry Date</label>
+                <input type="date" name="expiryDate" id="editExpiryDate" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+              </div>
+              <div class="col-span-2">
+                <label for="couponDescription" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Coupon Description</label>
+                <textarea id="couponDescription" name="couponDescription" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Write coupon description here"></textarea>
+              </div>
+            </div>
+            <button type="submit" class="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+              <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+              Add new Coupon
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
+      <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th scope="col" class="px-6 py-3">
+            No
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Coupon
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Code
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Amount
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Minimum Order Amount
+          </th>
+          <th scope="col" class="px-6 py-3">
+            Dates (yy/mm/dd)
+          </th>
+          <th scope="col" class="px-6 py-3">
+         Action
+        </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="coupon, iterationStat : ${coupons}" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <td th:text="${iterationStat.index + 1}"  class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+          </td>
+          <td class="px-6 py-4">
+            <span class="category-description font-medium text-gray-900" th:text="${coupon.name}"></span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="category-description font-medium text-gray-900" th:text="${coupon.couponCode}"></span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="category-description font-medium text-gray-900" th:text="${coupon.amount}"></span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="category-description font-medium text-gray-900" th:text="${coupon.minimumOrderAmount}"></span>
+          </td>
+          <td class="px-6 py-4">
+            <span class="category-description font-medium text-gray-900"><span th:text="${coupon.startDate}"></span> to <span th:text="${coupon.expiryDate}"></span></span>
+          </td>
+          <td class="px-6 py-4">
+            <a class="font-bold text-blue-600 underline mr-2" th:href="@{/admin/coupons/edit/{id}(id=${coupon.id})}" >Edit</a>
+            <a class="font-bold text-red-600 underline deleteButton" th:href="@{/admin/coupon/delete/{id}(id=${coupon.id})}">Delete</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div id="overlay"></div>
+
+<script>
+    function customConfirm(message) {
+      return new Promise((resolve) => {
+        // Show the overlay
+        document.getElementById('overlay').style.display = 'block';
+
+        const confirmContainer = document.createElement('div');
+        confirmContainer.style.zIndex = 4000;
+        confirmContainer.style.position = 'fixed';
+        confirmContainer.style.top = '50%';
+        confirmContainer.style.left = '50%';
+        confirmContainer.style.transform = 'translate(-50%, -50%)';
+        confirmContainer.style.background = '#f0f0f0'; // Light background color
+        confirmContainer.style.padding = '20px';
+        confirmContainer.style.borderRadius = '8px';
+        confirmContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+        const messageElement = document.createElement('p');
+        messageElement.textContent = message;
+        messageElement.style.marginBottom = '15px'; // Add some spacing between message and buttons
+        confirmContainer.appendChild(messageElement);
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.justifyContent = 'space-between';
+
+        const okButton = document.createElement('button');
+        okButton.textContent = 'OK';
+        okButton.style.padding = '8px 15px';
+        okButton.style.backgroundColor = '#28a745'; // Green color for OK button
+        okButton.style.color = '#fff'; // White text color
+        okButton.style.border = 'none';
+        okButton.style.borderRadius = '4px';
+        buttonContainer.appendChild(okButton);
+
+        const cancelButton = document.createElement('button');
+        cancelButton.textContent = 'Cancel';
+        cancelButton.style.padding = '8px 15px';
+        cancelButton.style.backgroundColor = '#dc3545'; // Red color for Cancel button
+        cancelButton.style.color = '#fff'; // White text color
+        cancelButton.style.border = 'none';
+        cancelButton.style.borderRadius = '4px';
+        buttonContainer.appendChild(cancelButton);
+
+        confirmContainer.appendChild(buttonContainer);
+
+        // Close the overlay when the user clicks OK or Cancel
+        const closeOverlay = () => {
+          document.body.removeChild(confirmContainer);
+          document.getElementById('overlay').style.display = 'none';
+        };
+
+        okButton.addEventListener('click', () => {
+          closeOverlay();
+          resolve(true);
+        });
+
+        cancelButton.addEventListener('click', () => {
+          closeOverlay();
+          resolve(false);
+        });
+
+        document.body.appendChild(confirmContainer);
+      });
+    }
+
+
+    // Use class for delete links
+    document.querySelectorAll('.deleteButton').forEach(function (button) {
+      button.addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent the default link behavior
+
+        const result = await customConfirm('Do you want to proceed?');
+        if (result) {
+          // If the user clicks OK, navigate to the link
+          window.location.href = event.target.getAttribute('href');
+        }
+        // If the user clicks Cancel, do nothing
+      });
+    });
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

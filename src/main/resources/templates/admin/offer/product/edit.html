@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <title>Add Product Offer</title>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+  <div class="text-center mb-4">
+    <h2 class="font-weight-bold">Product Offer Details</h2>
+  </div>
+
+  <div id="alert-1" th:if="${productError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${productError}"></span>
+  </div>
+
+  <div id="alert-2" th:if="${offerError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${offerError}"></span>
+  </div>
+
+  <div id="alert-3" th:if="${dateError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${dateError}"></span>
+  </div>
+
+  <div id="alert-4" th:if="${offerExist}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${offerExist}"></span>
+  </div>
+  <div id="alert-5" th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <span th:text="${error}"></span>
+  </div>
+
+  <form id="productOfferForm" th:action="@{/admin/offer/product/edit}" method="post">
+
+  <div class="form-group">
+      <h5><strong>Product Name :</strong> <span th:text="${offer.name}"></span></h5>
+    <input type="hidden" name="offerId" th:value="${offer.productId}">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group col-md-6">
+        <label for="offerAmount">Offer Amount:</label>
+        <input type="number" id="offerAmount" name="offerAmount" th:value="${offer.offerDiscount}" class="form-control">
+      </div>
+
+      <div class="form-group col-md-6">
+        <label for="offerEndDate">Offer Expiration Date:</label>
+        <input type="date" id="offerEndDate" name="offerEndDate" th:value="${offer.offerExpireDateTime}" class="form-control">
+      </div>
+    </div>
+
+    <div class="form-group text-right">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </form>
+</div>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+</body>
+</html>

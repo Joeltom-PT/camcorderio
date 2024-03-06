@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!-- Add your head content and links here -->
+
+    <!-- Include Tailwind CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="bg-gray-100">
+
+<div class="bg-white py-6 sm:py-8 lg:py-12">
+    <div class="mx-auto max-w-screen-2xl px-4 md:px-8">
+
+        <div class="mb-10 md:mb-16">
+            <h2 class="mb-4 text-center text-2xl font-bold text-gray-800 md:mb-6 lg:text-3xl">Edit Address</h2>
+        </div>
+
+        <!-- Address Form -->
+        <form th:action="@{/user/address/edit}" th:object="${address}" method="post" class="mx-auto grid max-w-screen-md gap-4 sm:grid-cols-2">
+
+            <input type="hidden" th:field="*{id}" />
+
+            <div>
+                <label for="name" class="mb-2 inline-block text-sm text-gray-800 sm:text-base">Name:</label>
+                <input type="text" id="name" name="name" th:field="*{name}" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring">
+                <span th:if="${nameError}" class="text-sm text-red-600" th:text="${nameError}"> </span>
+            </div>
+
+            <div>
+                <label for="mobile" class="mb-2 inline-block text-sm text-gray-800 sm:text-base">Mobile:</label>
+                <input type="text" id="mobile" name="mobile" th:field="*{mobile}" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring">
+                <span th:if="${numberError}" class="text-sm text-red-600" th:text="${numberError}"> </span>
+            </div>
+
+            <div class="sm:col-span-2">
+                <label for="address" class="mb-2 inline-block text-sm text-gray-800 sm:text-base">Address:</label>
+                <textarea id="address" name="address" th:field="*{address}" class="h-37 w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring"></textarea>
+                <span th:if="${addressError}" class="text-sm text-red-600" th:text="${addressError}"> </span>
+            </div>
+
+            <div class="mb-4">
+                <label for="city" class="block text-sm font-bold text-gray-600">City:</label>
+                <input type="text" id="city" name="city" th:field="*{city}" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring">
+                <span th:if="${cityError}" class="text-sm text-red-600" th:text="${cityError}"> </span>
+            </div>
+
+            <div class="mb-4">
+                <label for="pin" class="block text-sm font-bold text-gray-600">Pin:</label>
+                <input type="text" id="pin" name="pin" th:field="*{pin}" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring">
+                <span th:if="${pinError}" class="text-sm text-red-600" th:text="${pinError}"> </span>
+            </div>
+
+            <div class="mb-4">
+                <label for="state" class="block text-sm font-bold text-gray-600">State:</label>
+                <input type="text" id="state" name="state" th:field="*{state}" class="w-full rounded border bg-gray-50 px-3 py-2 text-gray-800 outline-none ring-indigo-300 transition duration-100 focus:ring">
+                <span th:if="${stateError}" class="text-sm text-red-600" th:text="${stateError}"> </span>
+            </div>
+
+            <div class="flex items-center justify-between sm:col-span-2">
+                <button type="submit" class="inline-block rounded-lg bg-indigo-500 px-8 py-3 text-center text-sm font-semibold text-white outline-none ring-indigo-300 transition duration-100 hover:bg-indigo-600 focus-visible:ring active:bg-indigo-700 md:text-base">Save Address</button>
+
+                <span class="text-sm text-gray-500">*Required</span>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

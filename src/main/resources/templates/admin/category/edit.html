@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Category</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
+</head>
+<body>
+
+
+
+<center style="padding-top: 5vh">
+<div class="w-full max-w-sm p-4 bg-white border border-gray-200 rounded-lg shadow sm:p-6 md:p-8 dark:bg-gray-800 dark:border-gray-700">
+    <form class="space-y-6" th:action="@{/admin/categories/edit/{id}(id=${category.categoryId})}" method="post" th:object="${category}">
+        <div th:if="${error}" class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+            <span th:text="${error}" class="font-medium"></span>
+        </div>
+        <h5 class="text-xl font-medium text-gray-900 dark:text-white">Edit Category</h5>
+        <input type="hidden" th:field="*{categoryId}">
+        <div>
+            <label for="categoryName" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category Name:</label>
+            <input type="text" id="categoryName" name="categoryName" th:field="*{categoryName}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" required>
+        </div>
+        <div>
+            <label for="categoryDescription" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description :</label>
+            <textarea id="categoryDescription" name="categoryDescription" th:field="*{categoryDescription}" maxlength="200" rows="3" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required></textarea>
+        </div>
+        <div class="flex justify-between">
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    <input type="checkbox" id="status" name="status" th:checked="*{status}" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-600 dark:border-gray-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800">
+                </div>
+                <label for="status" class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Status</label>
+            </div>
+        </div>
+        <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit Changes</button>
+        <div class="text-sm font-medium text-gray-500 dark:text-gray-300"> <a th:href="@{/admin/categories}" class="text-blue-700 hover:underline dark:text-blue-500">Back to List</a>
+        </div>
+    </form>
+</div>
+</center>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+</body>
+</html>

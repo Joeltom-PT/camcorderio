@@ -1,0 +1,78 @@
+<footer class="footer_widgets" th:fragment="footer">
+    <div class="footer_top">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 col-md-6">
+                    <div class="widgets_container contact_us">
+                        <div class="footer_logo"> <a href="/"><img src="/assets/img/logo/logo-l.svg" alt=""></a>
+                        </div>
+                        <div class="footer_contact">
+                             <p>Welcome to Camcorderio, your ultimate destination for premium cameras, drones, and accessories! As your go-to ecommerce platform, Camcorderio offers a curated selection of top-of-the-line equipment to elevate your videography projects. Whether you're a professional filmmaker, content creator, or hobbyist, find everything you need to capture stunning footage and breathtaking aerial shots. Browse our extensive catalog of cameras, drones, lenses, stabilizers, and more, sourced from leading brands worldwide. With Camcorderio, shop with confidence, knowing you're investing in quality gear backed by our commitment to customer satisfaction. Explore the possibilities at Camcorderio and transform your videography aspirations into reality!</p>
+                             </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="widgets_container widget_menu">
+                        <h3>My Account</h3>
+                        <div class="footer_menu">
+                            <ul>
+                                <li>
+                                    <a href="/contact-us">Contact Us</a>
+                                </li>
+                                <li>
+                                    <a href="/about-us">About Us</a>
+                                </li>
+                                <li>
+                                    <a href="/group-chat">Discuss room</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="widgets_container newsletter">
+                        <h3>More</h3>
+                        <div class="footer_social_link">
+                            <p>E-mail : <a href="mailto:camcorderiostore@gmail.com">camcorderiostore@gmail.com</a></p>
+                            <p> <span><strong>Check security level :</strong></span><span class="secure-icon"><a href="https://sitecheck.sucuri.net/results/camcorderio.shop" target="_blank"><img src="/assets/img/icon/security-84.svg" width="100px" alt=""></a></span></p>
+                            <p>Experience worry-free shopping at Camcorderio.shop. Our stringent security measures shield your transactions, protecting your privacy and ensuring a seamless shopping journey.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer_bottom">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 col-md-6">
+                    <div class="copyright_area">
+                        <p>© <span id="currentYear"></span> <a href="https://camcorderio.shop" >Camcorderio.shop</a>. All rights reserved.</p>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6">
+                    <div class="footer_payment text-right"> <a href="https://razorpay.com/"><img style="opacity: 65%" width="150px" th:src="@{/assets/img/icon/razorpay.svg}" alt=""></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var currentYear = new Date().getFullYear();
+        document.getElementById("currentYear").innerText = currentYear;
+    </script>
+
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+        var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+        (function(){
+            var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+            s1.async=true;
+            s1.src='https://embed.tawk.to/65e619ff8d261e1b5f6891bd/1ho5db4aq';
+            s1.charset='UTF-8';
+            s1.setAttribute('crossorigin','*');
+            s0.parentNode.insertBefore(s1,s0);
+        })();
+    </script>
+    <!--End of Tawk.to Script-->
+</footer>

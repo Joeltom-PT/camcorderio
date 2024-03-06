@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Wishlist</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Graduate&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li>Coupons</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div>
+
+    <section>
+        <div class="container justify-content-center align-items-center my-5">
+            <div class="row p-3">
+                <div th:each="coupon : ${coupons}" class="col col-sm-12 col-md-6 col-lg-4 d-flex justify-content-center align-items-stretch">
+                    <div class="card border-primary m-3 shadow">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title m-0" th:text="${coupon.name}"></h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <strong>Amount:</strong> <span th:text="${coupon.amount}"></span><br>
+                                <strong>Minimum Order Amount:</strong> <span th:text="${coupon.minimumOrderAmount}"></span><br>
+                                <strong>Coupon Code:</strong> <span th:text="${coupon.couponCode}"></span><br>
+                                <strong>Description:</strong> <span th:text="${coupon.couponDescription}"></span><br>
+                                <strong>Start Date:</strong> <span th:text="${coupon.startDate}"></span><br>
+                                <strong>Expiry Date:</strong> <span th:text="${coupon.expiryDate}"></span><br>
+                                <strong>Used:</strong> <span th:text="${coupon.used} ? 'Yes' : 'No'"></span><br>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+
+
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+<div th:replace="user/fragments/shipping_details :: shipping_details"></div>
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>

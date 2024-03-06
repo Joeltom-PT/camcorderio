@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Sales</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+            crossorigin="anonymous"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+
+    <style>
+        .chart-container {
+            width: 70%;
+            margin: 20px auto;
+            display: none;
+        }
+
+        .chart-container.show {
+            display: block;
+        }
+        #sales-report{
+            display: none;
+        }
+        #error{
+            display: none;
+        }
+    </style>
+
+</head>
+<body>
+
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+
+<div class="p-4 sm:ml-64">
+    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
+        <h2 class="text-2xl font-bold ">Sales</h2>
+            <h2 class="text-2xl text-center font-medium mt-2 underline decoration-indigo-500">Orders</h2>
+
+        <div class="sales-q-chart">
+            <div class="chart-container show" id="dailyChart">
+                <canvas id="dailyCanvas"></canvas>
+            </div>
+            <div class="chart-container hide" id="weeklyChart">
+                <canvas id="weeklyCanvas"></canvas>
+            </div>
+            <div class="chart-container hide" id="monthlyChart">
+                <canvas id="monthlyCanvas"></canvas>
+            </div>
+            <div class="chart-container hide" id="yearlyChart">
+                <canvas id="yearlyCanvas"></canvas>
+            </div>
+            <div class="flex justify-center">
+                <button onclick="showChart('dailyChart')" type="button"
+                        class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                    Daily Chart
+                </button>
+
+                <button onclick="showChart('weeklyChart')" type="button"
+                        class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                    Weekly Chart
+                </button>
+
+                <button onclick="showChart('monthlyChart')" type="button"
+                        class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                    Monthly Chart
+                </button>
+
+                <button onclick="showChart('yearlyChart')" type="button"
+                        class="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                    Yearly Chart
+                </button>
+            </div>
+        </div>
+
+        <button data-modal-target="default-modal" data-modal-toggle="default-modal" class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2" type="button">
+            Show Chart Report
+        </button>
+
+<!--        <div class="flex justify-center mt-3">-->
+<!--            <button type="button" id="sales-report-btn" onclick="salesReport()" class="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"></button>-->
+<!--        </div>-->
+
+        <!-- Main modal -->
+        <div id="default-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative p-4 w-full max-w-2xl max-h-full">
+                <!-- Modal content -->
+                <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                    <!-- Modal header -->
+                    <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white">
+                            Chart Values
+                        </h3>
+                        <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="default-modal">
+                            <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                            </svg>
+                            <span class="sr-only">Close modal</span>
+                        </button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="p-4 md:p-5 space-y-4">
+                        <div class="relative overflow-x-auto mt-5 table-container" id="dailyTable">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" id="daily">
+                                <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                                    Daily Report
+                                </caption>
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">
+                                        No
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Day
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Total Amount
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Number of Orders
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Number of Products Sold
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="day, iterationStat : ${dailySales}"
+                                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                        th:text="${iterationStat.index + 1}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${day.day}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${day.totalAmount}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${day.noOfOrders}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${day.noOfProductSold}">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="flex justify-end">
+                                <button onclick="javascript:exportDaily();"
+                                        class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
+                 <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                Download Report
+        </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative overflow-x-auto mt-2 table-container" id="weeklyTable">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" id="weekly">
+                                <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                                    Weekly Report
+                                </caption>
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">
+                                        No
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Week
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Total Amount
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Number of Orders
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Number of Products Sold
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="week, iterationStat : ${weeklySales}"
+                                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                        th:text="${iterationStat.index + 1}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${week.weeks}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${week.totalAmount}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${week.noOfOrders}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${week.noOfProductSold}">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="flex justify-end">
+                                <button onclick="javascript:exportWeekly();"
+                                        class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Download Report
+        </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative overflow-x-auto mt-2 table-container" id="monthlyTable">
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" id="monthly">
+                                <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                                    Monthly Report
+                                </caption>
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">
+                                        No
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Month
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Total Amount
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Number of Orders
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Number of Products Sold
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="month, iterationStat : ${monthlySales}"
+                                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                        th:text="${iterationStat.index + 1}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${month.month}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${month.totalAmount}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${month.noOfOrders}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${month.noOfProductSold}">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="flex justify-end">
+                                <button onclick="javascript:exportMonthly();"
+                                        class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Download Report
+        </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="relative overflow-x-auto mt-2 table-container" id="yearlyTable">
+
+                            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" id="yearly">
+                                <caption class="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                                    Yearly Report
+                                </caption>
+                                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">
+                                        No
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Year
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Total Amount
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Number of Orders
+                                    </th>
+                                    <th scope="col" class="px-6 py-3">
+                                        Number of Products Sold
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="year, iterationStat : ${yearlySales}"
+                                    class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"
+                                        th:text="${iterationStat.index + 1}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${year.year}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${year.totalAmount}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${year.noOfOrders}">
+                                    </td>
+                                    <td class="px-6 py-4" th:text="${year.noOfProductSold}">
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            <div class="flex justify-end">
+                                <button onclick="javascript:exportYearly();"
+                                        class="relative inline-flex items-center justify-center p-0.5 mb-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
+        <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Download Report
+        </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <h1 class="text-center text-2xl font-medium mt-2 underline decoration-indigo-500">Sales Report</h1>
+
+        <div class="flex justify-center mt-4">
+            <div>
+                <div id="error" class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                    <span id="error-message" class="font-medium"></span>
+                </div>
+            <div date-rangepicker class="flex items-center">
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                        </svg>
+                    </div>
+                    <input name="start" id="start-date" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date start">
+                </div>
+                <span class="mx-4 text-gray-500">to</span>
+                <div class="relative">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                        </svg>
+                    </div>
+                    <input name="end" id="end-date" type="text" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date end">
+                </div>
+            </div>
+                <div class="flex justify-center">
+            <button onclick="exportSalesReport()"
+                    class="relative inline-flex items-center justify-center p-0.5 mb-2 mt-2 me-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-purple-600 to-blue-500 group-hover:from-purple-600 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800">
+            <span class="relative px-5 py-2.5 transition-all ease-in duration-75 bg-white dark:bg-gray-900 rounded-md group-hover:bg-opacity-0">
+            Download Report
+            </span>
+            </button>
+                </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+<script>
+
+    var salesReportDiv = document.getElementById('sales-report');
+    function salesReport() {
+        if (salesReportDiv.style.display === 'none') {
+            salesReportDiv.style.display = 'block';
+            document.getElementById('sales-report-btn').innerHTML = "Hide Sales Report";
+        } else {
+            salesReportDiv.style.display = 'none';
+            document.getElementById('sales-report-btn').innerHTML = "Show Sales Report";
+        }
+    }
+</script>
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        showChart('dailyChart');
+    });
+
+    function showChart(chartId) {
+        // Hide all charts
+        const chartContainers = document.querySelectorAll('.chart-container');
+        chartContainers.forEach(container => {
+            container.classList.remove('show');
+        });
+
+        // Show the selected chart
+        const selectedChart = document.getElementById(chartId);
+        selectedChart.classList.add('show');
+    }
+</script>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var monthlyValues = /*[[${monthlyValues}]]*/ [];
+    var yearlyValues = /*[[${yearlyValues}]]*/ [];
+    var weekValues = /*[[${weeklyValues}]]*/ [];
+    var dailyValues = /*[[${dailyValues}]]*/ [];
+    /*]]>*/
+</script>
+
+
+<script>
+    const currentMonth = new Date().getMonth();
+    const monthLabels = [];
+    for (let i = 0; i < 7; i++) {
+        const monthIndex = (currentMonth - i + 12) % 12;
+        const monthName = new Intl.DateTimeFormat('en-US', {month: 'long'}).format(new Date(0, monthIndex));
+        monthLabels.unshift(monthName);
+    }
+
+    const monthlyData = {
+        labels: monthLabels,
+        datasets: [{
+            label: 'Monthly',
+            data: monthlyValues,
+            fill: false,
+            borderColor: 'rgb(104,117,245)',
+            tension: 0.0
+        }]
+    };
+
+    const monthlyConfig = {
+        type: 'line',
+        data: monthlyData,
+    };
+
+
+    const currentYear = new Date().getFullYear();
+    const yearLabels = [];
+
+    for (let i = 0; i < 3; i++) {
+        const year = currentYear - i;
+        yearLabels.unshift(year);
+    }
+
+    const yearlyData = {
+        labels: yearLabels,
+        datasets: [{
+            label: 'Yearly',
+            data: yearlyValues,
+            fill: false,
+            borderColor: 'rgb(104,117,245)',
+            tension: 0.0
+        }]
+    };
+
+    const yearlyConfig = {
+        type: 'line',
+        data: yearlyData,
+    };
+
+
+    function getWeekNumber(date) {
+        const currentDate = date || new Date();
+        const startOfYear = new Date(currentDate.getFullYear(), 0, 1);
+        const days = Math.floor((currentDate - startOfYear) / (24 * 60 * 60 * 1000));
+        const weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+        return weekNumber;
+    }
+
+    const currentWeek = getWeekNumber(new Date());
+
+    const weekLabels = [];
+
+    var j = -3;
+
+    for (let i = 0; i < 4; i++) {
+        const week = currentWeek - i;
+
+        if (j !== 0) {
+            weekLabels.push(j);
+        } else {
+            weekLabels.push("Current Week");
+        }
+
+        j++;
+    }
+
+
+    const weeklyData = {
+        labels: weekLabels,
+        datasets: [{
+            label: 'Weekly',
+            data: weekValues,
+            fill: false,
+            borderColor: 'rgb(104,117,245)',
+            tension: 0.0
+        }]
+    };
+
+
+    const weeklyConfig = {
+        type: 'line',
+        data: weeklyData,
+    };
+
+
+    const currentDay = new Date().getDate();
+    const currentMonths = new Date().getMonth() + 1;
+    const currentYears = new Date().getFullYear();
+
+    const getDaysInMonth = (month, year) => new Date(year, month, 0).getDate();
+
+    const monthNames = [
+        "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    ];
+
+    const dayLabels = [];
+
+    for (let i = 0; i < 8; i++) {
+        const day = currentDay - i;
+        let previousMonth = currentMonths;
+        let previousYear = currentYears;
+
+        if (day <= 0) {
+            previousMonth--;
+            if (previousMonth === 0) {
+                previousMonth = 12;
+                previousYear--;
+            }
+            const daysInPreviousMonth = getDaysInMonth(previousMonth, previousYear);
+            const previousDay = daysInPreviousMonth + day;
+            dayLabels.unshift(`${monthNames[previousMonth - 1]} ${previousDay}`);
+        } else {
+            dayLabels.unshift(`${monthNames[currentMonths - 1]} ${day}`);
+        }
+    }
+
+
+    const dailyData = {
+        labels: dayLabels,
+        datasets: [{
+            label: 'Daily',
+            data: dailyValues.reverse(),
+            fill: false,
+            borderColor: 'rgb(104,117,245)',
+            tension: 0.0
+        }]
+    };
+
+    const dailyConfig = {
+        type: 'line',
+        data: dailyData,
+    };
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('monthlyCanvas').getContext('2d');
+        new Chart(ctx, monthlyConfig);
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('yearlyCanvas').getContext('2d');
+        new Chart(ctx, yearlyConfig);
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('weeklyCanvas').getContext('2d');
+        new Chart(ctx, weeklyConfig);
+    });
+
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const ctx = document.getElementById('dailyCanvas').getContext('2d');
+        new Chart(ctx, dailyConfig);
+    });
+
+
+</script>
+
+<!--Ajax Request-->
+<script>
+    function DateError(errorMessage) {
+        var errorDiv = document.getElementById('error');
+        var errorMessageSpan = document.getElementById('error-message');
+
+        if (errorMessage) {
+            errorMessageSpan.textContent = errorMessage;
+        } else {
+            errorMessageSpan.textContent = "Invalid date input";
+        }
+
+        errorDiv.style.display = 'block';
+
+        setTimeout(function() {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    }
+
+    function exportSalesReport() {
+        var startDateInput = document.getElementById('start-date');
+        var endDateInput = document.getElementById('end-date');
+
+        var startDate = startDateInput.value;
+        var endDate = endDateInput.value;
+
+        if (!startDate || !endDate) {
+            DateError("Please enter both start and end dates.");
+            return;
+        }
+
+        const today = new Date();
+        if (startDate > today || endDate > today) {
+            DateError("Future dates are not allowed.");
+            return;
+        }
+
+        var url = '/admin/sales/salesReport/pdf?start=' + encodeURIComponent(startDate) + '&end=' + encodeURIComponent(endDate);
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Order not found with given dates or future date is not allowed');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'Sales_Report_' + startDate + '_to_' + endDate + '.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                a.remove();
+            })
+            .catch(error => {
+                DateError(error.message);
+                console.error('Order not found with given dates or future date is not allowed');
+            });
+    }
+</script>
+
+
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/2.3.5/jspdf.plugin.autotable.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+
+<script src="/assets/js/script.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/datepicker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

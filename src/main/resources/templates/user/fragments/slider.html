@@ -1,0 +1,27 @@
+<!--Slid Area-->
+<div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" th:fragment="slider">
+    <ol class="carousel-indicators">
+        <li th:each="banner, iterStat : ${banners}"
+            th:data-target="'#carouselExampleIndicators'"
+            th:data-slide-to="${iterStat.index}"
+            th:classappend="${iterStat.index == 0} ? 'active' : ''">
+        </li>
+    </ol>
+
+    <div class="carousel-inner">
+        <div th:each="banner, iterStat : ${banners}" class="carousel-item" th:classappend="${iterStat.index == 0} ? 'active' : ''">
+            <a th:href="${banner.url}"><img class="d-block w-100 h-100 md-h-100 sm-h-75"   th:src="${banner.imagePath}" alt="Slide"></a>
+        </div>
+    </div>
+
+    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+    </a>
+    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+    </a>
+</div>
+
+<!--Slid Area-->

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Products</title>
+
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: max-content;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -75px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .active {
+            color: green;
+        }
+
+        .inactive {
+            color: red;
+        }
+
+         .overlay {
+             position: fixed;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             z-index: 1000;
+             background-color: rgba(0, 0, 0, 0.41);
+             display: none;
+         }
+
+    </style>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css"  rel="stylesheet" />
+</head>
+<body>
+
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="p-4 sm:ml-64">
+    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
+        <a type="button" th:href="@{/admin/products/add}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">Add Product</a>
+
+        <div class="grid grid-cols-12 gap-4 mb-4">
+
+            <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-5">
+                    <table id="myTable" class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                No
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Image
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Name
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Brand
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Category
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Price
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Stock
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Status
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Action
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="product, iterationStat : ${products}" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                            <td th:text="${iterationStat.index + 1}" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                            </td>
+                            <td class="px-6 py-4 font-bold text-gray-900">
+                                <img th:src="${product.imagesPath.get(0)}" style="width: 70px; height: 70px">
+                            </td>
+
+                            <td class="px-6 py-4 font-bold text-gray-900" th:text="${product.name}">
+                            </td>
+                            <td class="px-6 py-4 font-bold text-gray-900" th:text="${product.getBrand().getBrandName()}">
+                            </td>
+                            <td class="px-6 py-4 font-bold text-gray-900" th:text="${product.getCategory().getCategoryName()}">
+                            </td>
+                            <td class="px-6 py-4 font-bold text-gray-900" th:text="${product.price}">
+                            </td>
+                            <td class="px-6 py-4 font-bold text-gray-900" th:text="${product.stock}">
+                            </td>
+                            <td th:text="${product.status ? 'Active' : 'Inactive'}"
+                                th:class="${product.status ? 'active' : 'inactive'}" class="px-6 py-4 font-bold text-gray-900">
+                            </td>
+                            <td class="px-6 py-4">
+                                <a class="font-bold text-blue-600 underline mr-2" th:href="@{/admin/products/edit/{id}(id=${product.productId})}">Edit</a>
+                                <a class="font-bold text-red-600 underline deleteButton" th:href="@{/admin/products/delete/{id}(id=${product.productId})}">Delete</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+<script type="text/javascript" charset="utf8" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#myTable').DataTable();
+    });
+
+    function customConfirm(message) {
+        return new Promise((resolve) => {
+            // Show the overlay
+            document.getElementById('overlay').style.display = 'block';
+
+            const confirmContainer = document.createElement('div');
+            confirmContainer.style.zIndex = 1001;
+            confirmContainer.style.position = 'fixed';
+            confirmContainer.style.top = '50%';
+            confirmContainer.style.left = '50%';
+            confirmContainer.style.transform = 'translate(-50%, -50%)';
+            confirmContainer.style.background = '#f0f0f0'; // Light background color
+            confirmContainer.style.padding = '20px';
+            confirmContainer.style.borderRadius = '8px';
+            confirmContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messageElement.style.marginBottom = '15px'; // Add some spacing between message and buttons
+            confirmContainer.appendChild(messageElement);
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'space-between';
+
+            const okButton = document.createElement('button');
+            okButton.textContent = 'OK';
+            okButton.style.padding = '8px 15px';
+            okButton.style.backgroundColor = '#28a745'; // Green color for OK button
+            okButton.style.color = '#fff'; // White text color
+            okButton.style.border = 'none';
+            okButton.style.borderRadius = '4px';
+            buttonContainer.appendChild(okButton);
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.padding = '8px 15px';
+            cancelButton.style.backgroundColor = '#dc3545'; // Red color for Cancel button
+            cancelButton.style.color = '#fff'; // White text color
+            cancelButton.style.border = 'none';
+            cancelButton.style.borderRadius = '4px';
+            buttonContainer.appendChild(cancelButton);
+
+            confirmContainer.appendChild(buttonContainer);
+
+            // Close the overlay when the user clicks OK or Cancel
+            const closeOverlay = () => {
+                document.body.removeChild(confirmContainer);
+                document.getElementById('overlay').style.display = 'none';
+            };
+
+            okButton.addEventListener('click', () => {
+                closeOverlay();
+                resolve(true);
+            });
+
+            cancelButton.addEventListener('click', () => {
+                closeOverlay();
+                resolve(false);
+            });
+
+            document.body.appendChild(confirmContainer);
+        });
+    }
+
+        // Use class for delete links
+        document.querySelectorAll('.deleteButton').forEach(function (button) {
+            button.addEventListener('click', async (event) => {
+                event.preventDefault(); // Prevent the default link behavior
+
+                const result = await customConfirm('Do you want to proceed?');
+                if (result) {
+                    // If the user clicks OK, navigate to the link
+                    window.location.href = event.target.getAttribute('href');
+                }
+                // If the user clicks Cancel, do nothing
+            });
+        });
+
+</script>
+
+</body>
+</html>

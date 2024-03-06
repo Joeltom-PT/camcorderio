@@ -1,0 +1,38 @@
+<!-- admin/add.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
+</head>
+<body>
+
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+<div class="p-4 sm:ml-64">
+    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
+        <div class="grid grid-cols-3 gap-4 mb-4">
+            <h2>Create Category</h2>
+
+            <form th:action="@{/categories/create}" th:object="${categoryDto}" method="post">
+                <label for="categoryName">Name:</label>
+                <input type="text" id="categoryName" th:field="*{categoryName}" required/><br/>
+
+                <label for="status">Status:</label>
+                <input type="checkbox" id="status" th:field="*{status}"/><br/>
+
+                <button type="submit">Create</button>
+            </form>
+
+            <a th:href="@{/categories}">Back to List</a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+  <title>Razorpay</title>
+  <link rel="shortcut icon" type="image/x-icon" th:href="@{assets/img/favicon.svg}">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    #razorpay-button {
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #007bff;
+      color: #fff;
+      border-radius: 3px;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+
+<input type="hidden" id="order-id" th:value="${razorpayOrderId}">
+<input type="hidden" id="total-amount" th:value="${totalOrderAmount}">
+
+<input type="hidden" id="username" th:value="${username}">
+<input type="hidden" id="email" th:value="${email}">
+
+<button id="razorpay-button">Pay with Razorpay</button>
+
+<script>
+  let razorpayOrderId = document.getElementById('order-id').value;
+  let amount = document.getElementById('total-amount').value;
+  let username = document.getElementById('username').value;
+  let email = document.getElementById('email').value;
+
+  // console.log(razorpayOrderId);
+  // console.log(amount);
+
+  var options = {
+    "key": "rzp_test_X4SnAv4Fzz1suL",
+    "amount": amount,
+    "currency": "INR",
+    "name": "Camcorderio",
+    "description": "Payment for Order",
+    "order_id": razorpayOrderId,
+    "handler": function (response) {
+      console.log(response);
+
+      let paymentId = response.razorpay_payment_id;
+      sendPaymentIdToBackend(paymentId);
+      setTimeout(function(){
+        window.location.href = '/user/orderPlaced';
+      }, 500);
+
+    },
+    "prefill": {
+      "name": username,
+      "email": email,
+      "contact": "+919876543210"
+    },
+    "error": function (error) {
+      console.log("Payment failed:", error);
+    }
+  };
+
+  var rzp1 = new Razorpay(options);
+  rzp1.on("payment.failed", function (response) {
+
+    setTimeout(function(){
+      window.location.href = '/user/orderFailed';
+    }, 500);
+
+  });
+
+
+  document.getElementById('razorpay-button').onclick = function () {
+    rzp1.open();
+
+    return false;
+  };
+
+
+  // function paymentFailed() {
+  //   fetch('/user/processRazorpayPayment/failed/more?orderId=' + razorpayOrderId, {
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //   })
+  //           .then(response => response.json())
+  //           .then(data => {
+  //             console.log("Payment ID sent to backend successfully");
+  //           })
+  //           .catch(error => {
+  //             console.error("Failed to send payment ID to backend", error);
+  //           });
+  // }
+
+
+  function sendPaymentIdToBackend(paymentId) {
+    fetch('/user/Failed/processRazorpayPayment?paymentId=' + paymentId, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+    })
+            .then(response => response.json())
+            .then(data => {
+              console.log("Payment ID sent to backend successfully");
+            })
+            .catch(error => {
+              console.error("Failed to send payment ID to backend", error);
+            });
+  }
+</script>
+
+</body>
+</html>

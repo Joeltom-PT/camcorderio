@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Profile</title>
+    <style>
+        .nav-listed:hover{
+            background-color: rgba(50, 119, 140, 0.15);
+        }
+        .nav-listed{
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div class="overlay" id="overlay"></div>
+
+<!--breadcrumbs area start-->
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li>profile</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--breadcrumbs area end-->
+
+<!--<section style="background-color: #eee;">-->
+<!--    <div class="container py-5">-->
+<!--        <div class="row">-->
+<!--            <div class="col">-->
+<!--                <nav aria-label="breadcrumb" class="bg-light rounded-3 p-3 mb-4">-->
+<!--                    <ol class="breadcrumb mb-0">-->
+<!--                        <li class="breadcrumb-item"><a href="#">Home</a></li>-->
+<!--                        <li class="breadcrumb-item"><a href="#">User</a></li>-->
+<!--                        <li class="breadcrumb-item active" aria-current="page">User Profile</li>-->
+<!--                    </ol>-->
+<!--                </nav>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<section class="my-5 mx-3">
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <h5 class="my-3" th:text="${user.username}"></h5>
+                        <p class="text-muted mb-1" th:text="${user.email}"></p>
+                        <div class="d-flex justify-content-center mb-2">
+                            <a href="/user/profile/edit" class="btn btn-primary btn-sm ms-1">Edit</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-4 mb-lg-0">
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush rounded-3">
+                            <a th:href="@{/user/orders}">
+                                <li class="nav-listed d-flex justify-content-between align-items-center p-3">
+                                    <h5>Orders</h5>
+                                </li>
+                            </a>
+                            <a th:href="@{/user/address}">
+                                <li class="nav-listed d-flex justify-content-between align-items-center p-3">
+                                    <h5>Address</h5>
+                                </li>
+                            </a>
+                            <a th:href="@{/user/wallet}">
+                                <li class="nav-listed d-flex justify-content-between align-items-center p-3">
+                                    <h5>Wallet</h5>
+                                </li>
+                            </a>
+                            <a th:href="@{/user/wishlist}">
+                                <li class="nav-listed d-flex justify-content-between align-items-center p-3">
+                                    <h5>Wishlist</h5>
+                                </li>
+                            </a>
+
+                            <li class=" d-flex justify-content-between align-items-center p-3">
+                                <form th:action="@{/logout}" method="post">
+                                    <button type="submit" class="btn btn-danger text-white">Logout</button>
+                                </form>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Name</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0" th:text="${user.username}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Email</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0" th:text="${user.email}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Phone</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <span th:if="${user.phoneNumber}">
+                                    <p class="text-muted mb-0" th:text="${user.phoneNumber}"></p>
+                                </span>
+                                <span th:unless="${user.phoneNumber}">
+                                    <a href="/user/profile/edit">
+                                        <p class="text-muted mb-0">Add phone number</p>
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Referral Code</p>
+                            </div>
+                            <div class="col-sm-9 d-flex align-items-center">
+                                <p class="text-muted mb-0 font-weight-bolder p-1 rounded" style="box-shadow: inset 0px 0px 4px cornflowerblue" th:text="${user.referralCode}" id="referralCode"></p>
+                                <button class="btn btn-outline-primary btn-sm ml-1" onclick="copyReferralCode()">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function copyReferralCode() {
+        var textToCopy = document.getElementById("referralCode").innerText;
+        var tempInput = document.createElement("input");
+        tempInput.value = textToCopy;
+        document.body.appendChild(tempInput);
+
+        tempInput.select();
+        tempInput.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+    }
+</script>
+
+<script>
+    function customConfirm(message) {
+        return new Promise((resolve) => {
+
+            document.getElementById('overlay').style.display = 'block';
+
+            const confirmContainer = document.createElement('div');
+            confirmContainer.style.zIndex = 1001;
+            confirmContainer.style.position = 'fixed';
+            confirmContainer.style.top = '50%';
+            confirmContainer.style.left = '50%';
+            confirmContainer.style.transform = 'translate(-50%, -50%)';
+            confirmContainer.style.background = '#f0f0f0';
+            confirmContainer.style.padding = '20px';
+            confirmContainer.style.borderRadius = '8px';
+            confirmContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messageElement.style.marginBottom = '15px';
+            confirmContainer.appendChild(messageElement);
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'space-between';
+
+            const okButton = document.createElement('button');
+            okButton.textContent = 'OK';
+            okButton.style.padding = '8px 15px';
+            okButton.style.backgroundColor = '#28a745';
+            okButton.style.color = '#fff';
+            okButton.style.border = 'none';
+            okButton.style.borderRadius = '4px';
+            buttonContainer.appendChild(okButton);
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.padding = '8px 15px';
+            cancelButton.style.backgroundColor = '#dc3545';
+            cancelButton.style.color = '#fff';
+            cancelButton.style.border = 'none';
+            cancelButton.style.borderRadius = '4px';
+            buttonContainer.appendChild(cancelButton);
+
+            confirmContainer.appendChild(buttonContainer);
+
+            const closeOverlay = () => {
+                document.body.removeChild(confirmContainer);
+                document.getElementById('overlay').style.display = 'none';
+            };
+
+            okButton.addEventListener('click', () => {
+                closeOverlay();
+                resolve(true);
+            });
+
+            cancelButton.addEventListener('click', () => {
+                closeOverlay();
+                resolve(false);
+            });
+
+            document.body.appendChild(confirmContainer);
+        });
+    }
+
+
+    document.querySelectorAll('.deleteButton').forEach(function (button) {
+        button.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const result = await customConfirm('Do you want to proceed?');
+            if (result) {
+                window.location.href = event.target.getAttribute('submit');
+            }
+        });
+    });
+</script>
+
+<div th:replace="user/fragments/shipping_details :: shipping_details"></div>
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>

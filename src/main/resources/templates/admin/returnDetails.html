@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Products Details</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="container d-flex justify-content-center align-items-center vh-100">
+  <div class="card text-center">
+    <div class="card-header">
+     Details
+    </div>
+    <div class="card-body">
+      <p class="card-text"><strong> Reason : </strong><span th:text="${request.returnReason}"></span></p>
+      <p class="card-text"><strong>Requested Date : </strong><span  th:text="${request.requestDate}"></span></p>
+      <p class="card-text"><strong>Order ID : </strong><span  th:text="${request.order.orderId}"></span></p>
+      <p class="card-text"><strong>User ID : </strong><span  th:text="${request.user.userId}"></span></p>
+
+      <form id="returnForm" th:action="@{/admin/order/return/from}" method="post">
+        <input type="hidden" id="returnId" name="id" th:value="${request.returnRequestId}">
+        <input type="hidden" id="returnDecision" name="returnDecision">
+
+        <button type="button" id="acceptButton" class="btn btn-primary">Accept</button>
+
+        <button type="button" id="rejectButton" class="btn btn-danger">Reject</button>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.getElementById('acceptButton').addEventListener('click', function() {
+    // Show SweetAlert confirmation
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You are about to accept the order return.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, accept it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Set return decision and submit form
+        document.getElementById('returnDecision').value = 'accept';
+        document.getElementById('returnForm').submit();
+      }
+    });
+  });
+
+  document.getElementById('rejectButton').addEventListener('click', function() {
+    // Show SweetAlert confirmation
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You are about to reject the order return.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, reject it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Set return decision and submit form
+        document.getElementById('returnDecision').value = 'reject';
+        document.getElementById('returnForm').submit();
+      }
+    });
+  });
+</script>
+
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

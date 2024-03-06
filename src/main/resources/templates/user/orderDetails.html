@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Order Details</title>
+    <style>
+        th,td{
+            align-items: center;
+          align-content: center;
+            justify-content: center;
+            text-align: center;
+            border: 1px solid black;
+        }
+    </style>
+    <style th:inline="text">
+        .hh-grayBox {
+            background-color: #F8F8F8;
+            margin-bottom: 20px;
+            padding: 35px;
+            margin-top: 20px;
+        }
+
+    </style>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.68/vfs_fonts.js"></script>
+
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/profile">Profile</a></li>
+                        <li><a href="/user/orders">Orders</a></li>
+                        <li>Order Details</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong th:text="${error}"></strong>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<section class="my-5 mx-3" th:object="${orderDetails}">
+    <h3 class="ml-3 mb-3">Order Details</h3>
+    <div class="row">
+                     <div class="col-6">
+                        <h4>Order Items</h4>
+                        <div class="table_desc">
+                            <div class="cart_page table-responsive">
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th class="product_thumb">Image</th>
+                                        <th class="product_name">Product</th>
+                                        <th class="product-price">Quantity</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <th:block th:each=" items : ${orderItems}">
+                                        <tr>
+                                          <th class="product_thumb"><img style="width: 100px; height: 100px;" th:src="${items.imageUrl}" alt="product Image"></th>
+                                        <th class="product_thumb" th:text="${items.productName}"></th>
+                                            <th class="product_thumb" th:text="${items.quantity}"></th>
+                                        </tr>
+                                    </th:block>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                     </div>
+
+                  <div class="col-6">
+                      <h4 style="color: #333; padding-left: 10px;">Order Information</h4>
+
+                      <div style="border: 1px solid #ccc; padding: 10px; margin: 10px;">
+                          <p style="margin-bottom: 5px;">Order Date: <span th:text="${orderDetails.orderDate}" style="font-weight: bold; color: #007bff;"></span></p>
+                          <p style="margin-bottom: 5px;">Total Amount: <span style="font-weight: bold; color: #28a745;">&#8377; </span><span th:text="${orderDetails.totalAmount}" style="font-weight: bold; color: #28a745;"></span></p>
+                          <p style="margin-bottom: 5px;">Coupon Discount: <span style="font-weight: bold; color: #282aa7;">&#8377; </span><span th:text="${orderDetails.CouponDiscount}" style="font-weight: bold; color: #282aa7;"></span></p>
+                          <p style="margin-bottom: 5px;">Status: <span th:text="${orderDetails.orderStatus}" style="font-weight: bold; color: #342f38;"></span></p>
+                          <p style="margin-bottom: 5px;">Payment Status: <span th:text="${orderDetails.paymentStatus}" style="font-weight: bold; color: #342f38;"></span></p>
+                          <p style="margin-bottom: 5px;">Payment Method: <span th:text="${orderDetails.paymentMethod}" style="font-weight: bold; color: #342f38;"></span></p>
+                          <p style="margin-bottom: 5px;">Address: <span th:text="${orderDetails.address}" style="font-weight: bold; color: #484949;"></span></p>
+                          <div th:if="${orderDetails.deliveredDate != null}">
+                              <p style="margin-bottom: 5px;">Delivered Date: <span th:text="${orderDetails.deliveredDate}" style="font-weight: bold; color: #484949;"></span></p>
+                          </div>
+                          <button th:if="${orderDetails.orderStatus ne 'CANCELLED' and orderDetails.orderStatus ne 'Delivered'}" type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#dangerModal">Cancel Order</button>
+
+                           <span>
+                           <button th:if="${orderDetails.orderStatus eq 'Delivered'}"
+                                   type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#returnModal">Return Order</button>
+                           </span>
+
+                          <button onclick="generatePdf(orderDetailDto)" type="button" class="btn btn-primary btn-sm">Invoice</button>
+
+
+
+                          <!-- Danger Modal -->
+                          <div class="modal fade rounded" id="dangerModal" role="dialog" th:if="${orderDetails.orderStatus ne 'CANCELLED' and orderDetails.orderStatus ne 'Delivered'}">
+                              <div class="modal-dialog modal-sm">
+                                  <div class="modal-content">
+                                      <div class="modal-header bg-danger text-white">
+                                          <h4 class="modal-title">Are you Sure</h4>
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button type="button" class="btn btn-default shadow-sm" data-dismiss="modal">Close</button>
+                                          <form th:action="@{/user/order/cancel/{id}(id=${orderDetails.orderId})}" method="post">
+                                              <button type="submit" class="btn btn-danger text-white">Proceed to Cancel</button>
+                                          </form>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+
+                          <!-- Return Modal -->
+                          <div class="modal fade" id="returnModal" role="dialog" th:if="${orderDetails.orderStatus eq 'Delivered'}">
+                              <div class="modal-dialog modal-sm">
+                                  <div class="modal-content">
+                                      <div class="modal-header bg-primary text-white">
+                                          <h4 class="modal-title">Return Order</h4>
+                                      </div>
+                                      <div class="modal-body">
+                                          <form th:action="@{/user/order/return}" method="post">
+                                              <div class="form-group">
+                                                  <label for="returnReason">Reason for Return:</label><br/>
+                                                  <select class="form-control" id="returnReason" name="returnReason" required>
+                                                      <option value="Damaged">Damaged</option>
+                                                      <option value="Wrong Item">Wrong Item</option>
+                                                      <option value="I find new one">I find new one</option>
+                                                      <option value="Other">Other</option>
+                                                  </select>
+                                              </div>
+                                              <input type="hidden" name="orderId" th:value="${orderDetails.orderId}" />
+                                              <button type="submit" class="btn btn-primary mt-3">Submit Return</button>
+                                          </form>
+                                      </div>
+                                      <div class="modal-footer">
+                                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+
+
+
+                      </div>
+
+
+
+
+    </div>
+    </div>
+</section>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var orderDetailDto = /*[[${orderDetails}]]*/ {};
+    /*]]>*/
+</script>
+
+
+<script>
+    function stripHtmlTags(html) {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || "";
+    }
+
+
+    function generatePdf(orderDetailDto) {
+        const { orderId, orderItems, address, orderDate, totalAmount, paymentMethod, paymentStatus, orderStatus, deliveredDate, returnExpiryDate, orderTrackingStatuses, couponDiscount } = orderDetailDto;
+
+        const tableContent = orderItems.map(item => [
+            stripHtmlTags(item.productName),
+            stripHtmlTags(item.quantity),
+        ]);
+
+        const content = [
+            { text: `Invoice - Order #${stripHtmlTags(orderId)}`, fontSize: 20, bold: true, alignment: 'center', margin: [0, 0, 0, 20] },
+            { text: `Order Date: ${stripHtmlTags(orderDate)}`, margin: [0, 0, 0, 10] },
+            { text: `Delivery Address: ${stripHtmlTags(address)}`, margin: [0, 0, 0, 10] },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: ['*', 'auto'],
+                    body: [
+                        [{ text: 'Product', style: 'tableHeader' }, { text: 'Quantity', style: 'tableHeader' }],
+                        ...tableContent
+                    ]
+                },
+                margin: [0, 0, 0, 20]
+            },
+            { text: `Total Amount: ${stripHtmlTags(totalAmount)}`, margin: [0, 0, 0, 10] },
+            { text: `Payment Method: ${stripHtmlTags(paymentMethod)}`, margin: [0, 0, 0, 10] },
+            { text: `Payment Status: ${stripHtmlTags(paymentStatus)}`, margin: [0, 0, 0, 10] },
+            { text: `Order Status: ${stripHtmlTags(orderStatus)}`, margin: [0, 0, 0, 10] }
+        ];
+
+        if (deliveredDate) {
+            content.push({ text: `Delivered Date: ${stripHtmlTags(deliveredDate)}`, margin: [0, 0, 0, 10] });
+        }
+
+        if (couponDiscount) {
+            content.push({ text: `Coupon discount: ${stripHtmlTags(couponDiscount)}`, margin: [0, 0, 0, 10] });
+        }
+
+        content.push({ text: 'Order Tracking Statuses: ', fontSize: 16, bold: true, margin: [0, 20, 0, 10] });
+        content.push({ text: ` ${stripHtmlTags(orderStatus)}`, fontSize: 14, bold: true, margin: [0, 2, 0, 10] });
+
+        const docDefinition = {
+            content,
+            styles: {
+                tableHeader: {
+                    bold: true,
+                    fontSize: 13,
+                    fillColor: '#eeeeee'
+                }
+            }
+        };
+
+        pdfMake.createPdf(docDefinition).download(`invoice_order_${stripHtmlTags(orderId)}.pdf`);
+    }
+
+
+
+
+</script>
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product</title>
+</head>
+<body>
+
+<h2>Add Product</h2>
+
+<form action="/products/add" method="post" th:object="${product}">
+    <label>Name: <input type="text" th:field="*{name}" /></label><br/>
+    <label>Price: <input type="number" step="0.01" th:field="*{price}" /></label><br/>
+    <label>Image URL: <input type="text" th:field="*{imageUrl}" /></label><br/>
+    <label>Description: <textarea th:field="*{description}"></textarea></label><br/>
+    <label>Category:
+        <select th:field="*{categoryId}">
+            <option th:each="category : ${categories}" th:value="${category.categoryId}" th:text="${category.name}"></option>
+        </select>
+    </label><br/>
+    <label>Brand:
+        <select th:field="*{brandId}">
+            <option th:each="brand : ${brands}" th:value="${brand.brandId}" th:text="${brand.name}"></option>
+        </select>
+    </label><br/>
+
+
+    <h3>Specifications</h3>
+    <div th:each="spec, iter : *{specifications}">
+        <label>Spec <span th:text="${iter.index + 1}">1</span>: <input type="text" th:field="*{specifications[__${iter.index}__].spec}" /></label>
+        <label>Value: <input type="text" th:field="*{specifications[__${iter.index}__].value}" /></label><br/>
+    </div>
+    <button type="button" onclick="addSpecification()">Add Specification</button>
+
+    <input type="submit" value="Add Product" />
+</form>
+
+<script th:inline="javascript">
+    function addSpecification() {
+        var index = /*[[${product.specifications.size()}]]*/ 0;
+        var template = document.querySelector("#specification-template").innerHTML;
+        var container = document.querySelector("#specifications-container");
+        var div = document.createElement("div");
+        div.innerHTML = template.replace(/__INDEX__/g, index);
+        container.appendChild(div);
+    }
+</script>
+
+<div id="specifications-container">
+
+</div>
+
+
+<script id="specification-template" type="text/template">
+    <label>Spec [[${index + 1}]]: <input type="text" th:field="*{specifications[__INDEX__].spec}" /></label>
+    <label>Value: <input type="text" th:field="*{specifications[__INDEX__].value}" /></label><br/>
+</script>
+
+<br/>
+<a href="/products/list">Back to Product List</a>
+
+</body>
+</html>

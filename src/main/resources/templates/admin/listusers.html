@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css"  rel="stylesheet" />
+</head>
+<body>
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+<div class="p-4 sm:ml-64">
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+        <form th:action="@{/admin/user/search}" method="post" style="margin-top: 50px" class="sm:w-full md:w-1/2">
+            <label for="default-search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+            <div class="relative">
+                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                    </svg>
+                </div>
+                <input type="search" id="default-search" name="search" class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Users..." required>
+                <button type="submit" class="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+            </div>
+        </form>
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">
+                            No
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                           Username
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Email
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Status
+                        </th>
+<!--                        <th scope="col" class="px-6 py-3">-->
+<!--                            Orders-->
+<!--                        </th>-->
+                        <th scope="col" class="px-6 py-3">
+                            Action
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="user, iterationStat : ${users}" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <td th:text="${iterationStat.index + 1}" class="px-6 py-4">
+                        </td>
+                        <th th:text="${user.username}" scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        </th>
+                        <td th:text="${user.email}" class="px-6 py-4">
+                        </td>
+                        <td th:text="${user.status ? 'Active' : 'Inactive'}"
+                            th:class="${user.status ? 'active' : 'inactive'}" class="px-6 py-4">
+                        </td>
+<!--                        <td class="px-6 py-4">-->
+<!--                            <button type="button" class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-900">Orders</button>-->
+<!--                        </td>-->
+                        <td class="px-6 py-4">
+                        <span th:if="${user.status}">
+                            <a type="button" id="myButton" th:href="@{/admin/user/{userId}/togglestatus(userId=${user.userId})}"  class="text-white bg-red-700 hover:bg-red-800 focus:outline-none focus:ring-4 focus:ring-red-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">Block</a>
+                        </span>
+                        <span th:unless="${user.status}">
+                           <a type="button" id="myButton1" th:href="@{/admin/user/{userId}/togglestatus(userId=${user.userId})}" class="text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-900">Active</a>
+                        </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+        <nav aria-label="Page navigation example" th:if="${users.totalPages > 1}">
+            <ul class="inline-flex -space-x-px text-sm">
+                <li th:if="${users.hasPrevious}">
+                    <a class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" th:href="@{'/admin/users?page=' + ${users.number - 1}}">Previous</a>
+                </li>
+                <li th:each="i : ${#numbers.sequence(0, users.totalPages - 1)}"
+                    th:class="${users.number == i} ? 'page-item active' : 'page-item'">
+                    <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" th:href="@{'/admin/users?page=' + ${i}}" th:text="${i + 1}"></a>
+                </li>
+                <li th:if="${users.hasNext}">
+                    <a class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 rounded-e-lg hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white" th:href="@{'/admin/users?page=' + ${users.number + 1}}">Next</a>
+                </li>
+            </ul>
+        </nav>
+            </div>
+
+    <br>
+
+    </div>
+</div>
+
+<script>
+    function customConfirm(message) {
+        return new Promise((resolve) => {
+            const confirmContainer = document.createElement('div');
+            confirmContainer.style.position = 'fixed';
+            confirmContainer.style.top = '50%';
+            confirmContainer.style.left = '50%';
+            confirmContainer.style.transform = 'translate(-50%, -50%)';
+            confirmContainer.style.background = '#f0f0f0'; // Light background color
+            confirmContainer.style.padding = '20px';
+            confirmContainer.style.borderRadius = '8px';
+            confirmContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+            const messageElement = document.createElement('p');
+            messageElement.textContent = message;
+            messageElement.style.marginBottom = '15px'; // Add some spacing between message and buttons
+            confirmContainer.appendChild(messageElement);
+
+            const buttonContainer = document.createElement('div');
+            buttonContainer.style.display = 'flex';
+            buttonContainer.style.justifyContent = 'space-between';
+
+            const okButton = document.createElement('button');
+            okButton.textContent = 'OK';
+            okButton.style.padding = '8px 15px';
+            okButton.style.backgroundColor = '#28a745'; // Green color for OK button
+            okButton.style.color = '#fff'; // White text color
+            okButton.style.border = 'none';
+            okButton.style.borderRadius = '4px';
+            okButton.addEventListener('click', () => {
+                document.body.removeChild(confirmContainer);
+                resolve(true);
+            });
+            buttonContainer.appendChild(okButton);
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.style.padding = '8px 15px';
+            cancelButton.style.backgroundColor = '#dc3545'; // Red color for Cancel button
+            cancelButton.style.color = '#fff'; // White text color
+            cancelButton.style.border = 'none';
+            cancelButton.style.borderRadius = '4px';
+            cancelButton.addEventListener('click', () => {
+                document.body.removeChild(confirmContainer);
+                resolve(false);
+            });
+            buttonContainer.appendChild(cancelButton);
+
+            confirmContainer.appendChild(buttonContainer);
+
+            document.body.appendChild(confirmContainer);
+        });
+    }
+
+
+    // Attach the custom confirmation to the link
+    document.getElementById('myButton').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent the default link behavior
+
+        const result = await customConfirm('Do you want to proceed?');
+        if (result) {
+            // If the user clicks OK, navigate to the link
+            window.location.href = event.target.getAttribute('href');
+        }
+        // If the user clicks Cancel, do nothing
+    });
+    document.getElementById('myButton1').addEventListener('click', async (event) => {
+        event.preventDefault(); // Prevent the default link behavior
+
+        const result = await customConfirm('Do you want to proceed?');
+        if (result) {
+            // If the user clicks OK, navigate to the link
+            window.location.href = event.target.getAttribute('href');
+        }
+        // If the user clicks Cancel, do nothing
+    });
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

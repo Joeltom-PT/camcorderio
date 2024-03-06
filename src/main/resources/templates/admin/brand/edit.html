@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Brand</title>
+</head>
+<body>
+<h2>Edit Brand</h2>
+
+<div th:if="${error}" class="text-red-500 mt-2">
+    <span th:text="${error}"></span>
+</div>
+
+<form th:action="@{/admin/brands/edit/{id}(id=${brand.brandId})}" method="post" th:object="${brand}">
+    <input type="hidden" th:field="*{brandId}">
+
+    <label for="brandName">Brand Name:</label>
+    <input type="text" id="brandName" name="brandName" th:field="*{brandName}" required>
+
+    <label for="brandDescription">Brand Description:</label>
+    <textarea id="brandDescription" name="brandDescription" maxlength="200" th:field="*{brandDescription}" required></textarea>
+
+    <label for="status">Status:</label>
+    <input type="checkbox" id="status" name="status" th:checked="${brand.status}">
+
+    <button type="submit">Save</button>
+</form>
+
+<a th:href="@{/admin/brands}">Back to List</a>
+</body>
+</html>

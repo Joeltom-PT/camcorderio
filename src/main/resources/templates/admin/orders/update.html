@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin - Categories</title>
+
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: max-content;
+            background-color: #fff;
+            color: #000;
+            border: 1px solid #ccc;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -75px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .active {
+            color: green;
+        }
+
+        .inactive {
+            color: red;
+        }
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.41);
+            display: none;
+        }
+
+    </style>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css"  rel="stylesheet" />
+</head>
+<body>
+
+<div th:replace="admin/fragments/navbar :: navbar"></div>
+
+<div th:replace="admin/fragments/sidebar :: sidebar"></div>
+
+<div class="overlay" id="overlay"></div>
+
+
+<div class="p-4 sm:ml-64">
+    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
+
+            <!-- Form for editing order details -->
+        <form th:action="@{/admin/update/order}" th:object="${orderDetail}" method="post" id="editOrderForm">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <h2 class="col-span-2 text-xl font-semibold mb-4">Order Details</h2>
+
+                <input type="hidden" name="orderId" th:value="${orderDetail.orderId}">
+
+                <div class="col-span-2 md:col-span-1 bg-white p-4 rounded-lg shadow-md">
+                    <div class="mb-4">
+                        <strong class="block">Order ID:</strong> <span th:text="${orderDetail.orderId}"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">User ID:</strong> <span th:text="${orderDetail.userId}"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Username:</strong> <span th:text="${orderDetail.username}"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Email:</strong> <span th:text="${orderDetail.email}"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Status</strong> <span th:text="${orderDetail.status}"></span>
+                    </div>
+                    <div class="mb-4" th:unless="${orderDetail.status == 'CANCELLED' or orderDetail.status == 'Delivered'}">
+                        <strong class="block">Status:</strong>
+                        <select th:field="${orderDetail.status}" class="w-full p-2 border rounded">
+                            <option value="Processing" th:selected="${orderDetail.status == 'Processing'}">Processing</option>
+                            <option value="Shipped" th:selected="${orderDetail.status == 'Shipped'}">Shipped</option>
+                            <option value="Delivered" th:selected="${orderDetail.status == 'Delivered'}">Delivered</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <strong class="block">Phone Number:</strong> <span th:text="${orderDetail.phoneNumber}"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Address:</strong> <span th:text="${orderDetail.address.getFullAddress()}"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Order Date:</strong> <span th:text="${orderDetail.orderDate}"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Total Amount:</strong> <span th:text="${orderDetail.totalAmount}"></span>
+                    </div>
+                    <div class="mb-4" th:unless="${orderDetail.status == 'CANCELLED'}">
+                        <strong class="block">Payment Status:</strong>
+                        <select th:field="${orderDetail.paymentStatus}" class="w-full p-2 border rounded">
+                            <option value="Paid" th:selected="${orderDetail.paymentStatus == 'Paid'}">Paid</option>
+                            <option value="Pending" th:selected="${orderDetail.paymentStatus == 'Pending'}">Pending</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Delivery Status:</strong> <span th:text="${orderDetail.deliveryStatus}"></span>
+                    </div>
+                    <div class="mb-4" th:if="${orderDetail.deliveryStatus != 'CANCELLED'}">
+                        <strong class="block">Delivered Date:</strong>
+                        <input th:if="${orderDetail.deliveredDate == null}" type="date" th:field="${orderDetail.deliveredDate}" class="w-full p-2 border rounded">
+                        <span th:if="${orderDetail.deliveredDate != null}" th:text="${orderDetail.deliveredDate}" class="text-gray-600"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Return Expiry Date:</strong> <span th:text="${orderDetail.returnExpiryDate}"></span>
+                    </div>
+                    <div class="mb-4">
+                        <strong class="block">Cancelled:</strong> <span th:text="${orderDetail.cancelled}"></span>
+                    </div>
+<!--                    <div class="mb-4" th:if="${orderDetail.refund}">-->
+<!--                        <strong class="block">Refund :</strong> <span th:text="${orderDetail.refundStatus}"></span>-->
+<!--                    </div>-->
+                    <button type="submit" form="editOrderForm" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+
+
+        </div>
+    </div>
+
+<div class="p-4 sm:ml-64">
+    <div class="p-4 rounded-lg dark:border-gray-700 mt-14">
+
+
+                    <!-- Assuming orderItems is the list of OrderItemDto objects in your model -->
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        <!-- Display heading for Product Image -->
+                        <span class="sr-only">Product Image</span>
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        <!-- Display heading for Product Name -->
+                        Product Name
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        <!-- Display heading for Quantity -->
+                        Quantity
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Loop through order items -->
+                <tr th:each="item : ${orderItem}" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td class="p-4">
+                        <!-- Display product image -->
+                        <img th:src="${item.imageUrl}" class="w-16 md:w-32 max-w-full max-h-full" alt="Product Image">
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                        <!-- Display product name -->
+                        <span th:text="${item.productName}"></span>
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
+                        <!-- Display quantity -->
+                        <span th:text="${item.quantity}"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+    </div>
+
+    </div>
+
+
+
+
+
+</div>
+</div>
+
+
+
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var categoryDescriptions = document.querySelectorAll(".category-description");
+
+        categoryDescriptions.forEach(function (description) {
+            var originalText = description.textContent.trim();
+            var maxLength = 20;
+
+            if (originalText.length > maxLength) {
+                var truncatedText = originalText.substring(0, maxLength) + '...';
+                description.textContent = truncatedText;
+            }
+        });
+
+        function customConfirm(message) {
+            return new Promise((resolve) => {
+                // Show the overlay
+                document.getElementById('overlay').style.display = 'block';
+
+                const confirmContainer = document.createElement('div');
+                confirmContainer.style.zIndex = 1001;
+                confirmContainer.style.position = 'fixed';
+                confirmContainer.style.top = '50%';
+                confirmContainer.style.left = '50%';
+                confirmContainer.style.transform = 'translate(-50%, -50%)';
+                confirmContainer.style.background = '#f0f0f0'; // Light background color
+                confirmContainer.style.padding = '20px';
+                confirmContainer.style.borderRadius = '8px';
+                confirmContainer.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+
+                const messageElement = document.createElement('p');
+                messageElement.textContent = message;
+                messageElement.style.marginBottom = '15px'; // Add some spacing between message and buttons
+                confirmContainer.appendChild(messageElement);
+
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.display = 'flex';
+                buttonContainer.style.justifyContent = 'space-between';
+
+                const okButton = document.createElement('button');
+                okButton.textContent = 'OK';
+                okButton.style.padding = '8px 15px';
+                okButton.style.backgroundColor = '#28a745'; // Green color for OK button
+                okButton.style.color = '#fff'; // White text color
+                okButton.style.border = 'none';
+                okButton.style.borderRadius = '4px';
+                buttonContainer.appendChild(okButton);
+
+                const cancelButton = document.createElement('button');
+                cancelButton.textContent = 'Cancel';
+                cancelButton.style.padding = '8px 15px';
+                cancelButton.style.backgroundColor = '#dc3545'; // Red color for Cancel button
+                cancelButton.style.color = '#fff'; // White text color
+                cancelButton.style.border = 'none';
+                cancelButton.style.borderRadius = '4px';
+                buttonContainer.appendChild(cancelButton);
+
+                confirmContainer.appendChild(buttonContainer);
+
+                // Close the overlay when the user clicks OK or Cancel
+                const closeOverlay = () => {
+                    document.body.removeChild(confirmContainer);
+                    document.getElementById('overlay').style.display = 'none';
+                };
+
+                okButton.addEventListener('click', () => {
+                    closeOverlay();
+                    resolve(true);
+                });
+
+                cancelButton.addEventListener('click', () => {
+                    closeOverlay();
+                    resolve(false);
+                });
+
+                document.body.appendChild(confirmContainer);
+            });
+        }
+
+
+        // Use class for delete links
+        document.querySelectorAll('.deleteButton').forEach(function (button) {
+            button.addEventListener('click', async (event) => {
+                event.preventDefault(); // Prevent the default link behavior
+
+                const result = await customConfirm('Do you want to proceed?');
+                if (result) {
+                    // If the user clicks OK, navigate to the link
+                    window.location.href = event.target.getAttribute('href');
+                }
+                // If the user clicks Cancel, do nothing
+            });
+        });
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+</body>
+</html>

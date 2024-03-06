@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - Products</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        #increase-alert{
+            display: none;
+        }
+        #degrease-alert{
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div id="degrease-alert" class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>Quantity cannot be less than 1.</strong>
+</div>
+
+<div id="increase-alert" class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>Maximum quantity is 5.</strong>
+</div>
+
+<!-- Modal for successful removal -->
+<div class="modal" id="removeCartItemModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Product Removed</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Your selected product has been successfully removed from the cart.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong th:text="${error}"></strong>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal" id="confirmationModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Removal</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to remove this item from the cart?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmRemovalBtn">Remove</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--shopping cart area start -->
+<div class="shopping_cart_area mt-60">
+    <div class="container">
+        <form action="#">
+            <div class="row">
+                <div class="col-12">
+                    <div class="table_desc">
+                        <div class="cart_page table-responsive">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th class="product_thumb">Image</th>
+                                    <th class="product_name">Product</th>
+                                    <th class="product-price">Price</th>
+                                    <th class="product_quantity">Quantity</th>
+                                    <th class="product_total">Total</th>
+                                    <th class="product_remove">Remove</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <th:block th:each="cartProduct : ${cartedProducts}">
+                                    <tr>
+                                        <td class="product_thumb">
+                                            <a th:href="@{/product/{productId}(productId=${cartProduct.productId})}">
+                                                <img th:src="${cartProduct.productImage}" alt="">
+                                            </a>
+                                        </td>
+                                        <td class="product_name">
+                                            <a th:href="@{/product/{productId}(productId=${cartProduct.productName})}" th:text="${cartProduct.productName}"></a>
+                                        </td>
+                                        <td class="product-price" th:data-product-id-find-price="${cartProduct.productId}" th:text="${cartProduct.productPrice - cartProduct.offerAmount}"></td>
+                                        <td class="product_quantity">
+                                            <label>Quantity</label>
+                                            <input min="1" max="5" th:value="${cartProduct.quantity}" type="number" th:data-product-id-find="${cartProduct.productId}" th:disabled="${cartProduct.quantity > 5}">
+                                            <span>
+                                            <i class="fa fa-angle-up fa-2x up-to-cart-btn" th:data-product-id="${cartProduct.productId}"></i>
+                                               </span><span>
+                                          <i class="fa fa-angle-down fa-2x down-to-cart-btn" th:data-product-id="${cartProduct.productId}"></i>
+                                               </span>
+                                        </td>
+                                        <td class="product_total" th:data-product-id-find-each-total="${cartProduct.productId}" th:text="${'$' + (cartProduct.quantity * (cartProduct.productPrice - cartProduct.offerAmount))}"></td>
+                                        <td class="product_remove">
+                                            <a href="" class="remove-from-cart-btn" th:data-product-id="${cartProduct.productId}">
+                                                <i class="ion-android-close"></i>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                </th:block>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--coupon code area start-->
+            <div class="coupon_area">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 hidden">
+                        <div class="coupon_code left">
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6">
+                        <div class="coupon_code right">
+                            <h3>Cart Totals</h3>
+                            <div class="coupon_inner">
+                                <div class="cart_subtotal">
+                                    <p>Subtotal</p>
+                                    <p class="cart_total">&#8377;<span th:text="${cart.totalPrice}"></span></p>
+                                </div>
+                                <div class="cart_subtotal" th:if="${cart.totalPrice gt 1000}">
+                                    <p>Delivery Charge</p>
+                                    <p class="cart_total">&#8377;<span>40</span></p>
+                                </div>
+                                <div class="cart_subtotal">
+                                    <p>Total</p>
+                                    <p class="cart_total">&#8377;<span th:if="${cart.totalPrice gt 1000}" th:text="${cart.totalPrice + 40}"></span><span th:unless="${cart.totalPrice gt 1000}" th:text="${cart.totalPrice}"></span></p>
+                                </div>
+                                <div class="checkout_btn">
+                                    <a th:href="@{/user/cart/submit}" type="submit">Proceed to Checkout</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--coupon code area end-->
+        </form>
+    </div>
+</div>
+<!--shopping cart area end -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Add to cart button click event
+        document.querySelectorAll('.up-to-cart-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                let productId = this.getAttribute('data-product-id');
+                let element = document.querySelector('[data-product-id-find="' + productId + '"]');
+                if (element.value<=4){
+                    $.ajax({
+                        url: `/up/to/cart?productId=${productId}`,
+                        type: 'get',
+                        dataType: 'json',
+                        success: function (response) {
+                            console.log("successful");
+                            console.log(response);
+                        }
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll('.up-to-cart-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                let productId = this.getAttribute('data-product-id');
+                let element = document.querySelector('[data-product-id-find="' + productId + '"]');
+                // let element1 = document.querySelector('[data-product-id-find-each-total="' + productId + '"]')
+                let priceElement = document.querySelector('[data-product-id-find-price="' + productId + '"]')
+                let price = priceElement.textContent.trim();
+                let priceInNumber = parseFloat(price);
+
+                if (element && element.tagName === 'INPUT' && element.type === 'number') {
+                    let currentValue = parseInt(element.value, 10);
+                    if (!isNaN(currentValue)&& element.value<5) {
+                        let newValue = currentValue + 1;
+                        element.value = newValue;
+                        let newPrice = newValue * priceInNumber;
+                        element.textContent = newPrice;
+                    }
+                    if (currentValue == 5){
+                        document.getElementById('increase-alert').style.display = 'block';
+                            let alertElement = document.getElementById('increase-alert');
+                            alertElement.classList.remove('show');
+
+                            alertElement.classList.add('show');
+                    }else{
+                        setTimeout(function() {
+                            location.reload();
+                        }, 300);
+                    }
+                }
+
+                // if (element1 && element1.tagName === 'TD') {
+                //     let textContent = element1.textContent.trim();
+                //     let numericValue = parseFloat(textContent);
+                //     if (!isNaN(numericValue)) {
+                //         let newValue = numericValue + 100;
+                //         console.log(newValue);
+                //     }
+                // }
+            });
+        });
+
+
+
+        document.querySelectorAll('.remove-from-cart-btn').forEach(function (button) {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                // Get product information from data attributes
+                let productId = this.getAttribute('data-product-id');
+
+                // Show the confirmation modal
+                $('#confirmationModal').modal('show');
+
+                // Handle removal when the confirmation button is clicked
+                $('#confirmRemovalBtn').on('click', function () {
+                    // Close the modal
+                    $('#confirmationModal').modal('hide');
+
+                    // Proceed with the removal
+                    $.ajax({
+                        url: `/remove/cart/item?productId=${productId}`,
+                        type: 'get',
+                        dataType: 'json',
+                        success: function (response) {
+                            console.log("Successful removal");
+                            console.log(response);
+                        }
+                    });
+                });
+            });
+        });
+
+        $('#confirmRemovalBtn').on('click', function () {
+            // Add a delay of 2 seconds (2000 milliseconds)
+            setTimeout(function () {
+                // Reload the page after the delay
+                location.reload();
+            }, 300);
+        });
+
+
+        document.querySelectorAll('.down-to-cart-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                let productId = this.getAttribute('data-product-id');
+                let element = document.querySelector('[data-product-id-find="' + productId + '"]');
+                let currentValue = parseInt(element.value, 10);
+                console.log(currentValue)
+                if (currentValue>1){
+                    $.ajax({
+                        url: `/down/to/cart?productId=${productId}`,
+                        type: 'get',
+                        dataType: 'json',
+                        success: function (response) {
+                            console.log("successful");
+                            console.log(response);
+                        }
+                    });
+                }
+            });
+        });
+        document.querySelectorAll('.down-to-cart-btn').forEach(function (button) {
+            button.addEventListener('click', function () {
+                let productId = this.getAttribute('data-product-id');
+                let element = document.querySelector('[data-product-id-find="' + productId + '"]');
+                if (element && element.tagName === 'INPUT' && element.type === 'number') {
+                    let currentValue = parseInt(element.value, 10);
+                    if (!isNaN(currentValue)&& element.value>1) {
+                        let newValue = currentValue - 1;
+                        element.value = newValue;
+                    }
+                    if (currentValue == 1){
+                       document.getElementById('degrease-alert').style.display = 'block';
+                        let alertElement = document.getElementById('degrease-alert');
+                        alertElement.classList.remove('show');
+
+                        alertElement.classList.add('show');
+                    }else{
+                        setTimeout(function() {
+                            location.reload();
+                        }, 300);
+                    }
+                }
+            });
+        });
+    });
+</script>
+
+<div th:replace="user/fragments/shipping_details :: shipping_details"></div>
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>
+

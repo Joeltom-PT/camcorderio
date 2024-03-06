@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+  <title>Camcorderio - Home</title>
+  <style>
+    .coupon-placeholder::placeholder{
+      color: rgba(128, 128, 128, 0.75);
+    }
+  </style>
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+<div th:if="${addressError}" class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong th:text="${addressError}"></strong>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div th:if="${paymentError}" class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong th:text="${paymentError}"></strong>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div th:if="${quantityError}" class="alert alert-warning alert-dismissible fade show" role="alert">
+  <strong th:text="${quantityError}"></strong>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div th:if="${codError}" class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong th:text="${codError}"></strong>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div>
+  <!--Checkout page section-->
+  <div class="Checkout_section mt-60">
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+
+        </div>
+      </div>
+      <form th:action="@{/user/placeOrder}" method="post">
+        <div class="checkout_form">
+          <div class="row">
+            <div class="col-lg-6 col-md-6">
+              <h3>Select Address</h3>
+              <div class="row">
+                <div th:if="${#lists.isEmpty(allAddress)}">
+                  <a class="btn btn-primary ml-3" href="/user/address/add">Add Address</a>
+                </div>
+                <div class="col-md-6 mb-4" th:each="address, addressIndex : ${allAddress}">
+                  <div class="card mb-4 mb-md-0">
+                    <div class="card-body shadow rounded">
+                      <input type="radio" th:id="${'addressRadio_' + address.id}" name="selectedAddress"
+                             th:value="${address.id}" width="3px"/>
+                      <div class="w-100">
+                        <p><span class="font-weight-bold">Name: </span><span th:text="${address.name}"></span></p>
+                        <hr>
+                        <p><span class="font-weight-bold">Mobile: </span><span th:text="${address.mobile}"></span></p>
+                        <hr>
+                        <p><span class="font-weight-bold">Address: </span><span th:text="${address.address}"></span></p>
+                        <hr>
+                        <p><span class="font-weight-bold">City: </span><span th:text="${address.city}"></span></p>
+                        <hr>
+                        <p><span class="font-weight-bold">State: </span><span th:text="${address.state}"></span></p>
+                        <hr>
+                        <p><span class="font-weight-bold">Pin: </span><span th:text="${address.pin}"></span></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-6 col-md-6">
+              <h3>Your order</h3>
+              <div class="order_table table-responsive">
+                <table class="table-responsive">
+                  <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Total</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <th:block th:each="cartProduct : ${cartedProducts}">
+                    <tr>
+                      <td th:text="${cartProduct.productName + ' × ' + cartProduct.quantity}"></td>
+                      <td th:text="${'&#8377; ' + (cartProduct.quantity * (cartProduct.productPrice - cartProduct.offerAmount))}"></td>
+                    </tr>
+                  </th:block>
+                  </tbody>
+                  <tfoot>
+                  <tr>
+                    <th>Cart Subtotal</th>
+                    <td><strong>&#8377; <span th:text="${cart.totalPrice}"></span></strong></td>
+                  </tr>
+                  <tr th:if="${cart.totalPrice gt 1000}">
+                    <th>Delivery Charge</th>
+                    <td><strong>&#8377; <span>40</span></strong></td>
+                  </tr>
+<!--                  <tr>-->
+<!--                    <th>Coupon Discount</th>-->
+<!--                    <td><strong>&#8377; <span th:text="${cart.totalPrice}"></span></strong></td>-->
+<!--                  </tr>-->
+                  <tr class="order_total">
+                    <th>Order Total</th>
+                    <td><strong>&#8377; <span th:if="${cart.totalPrice gt 1000}" th:text="${cart.totalPrice + 40}"></span><span th:unless="${cart.totalPrice gt 1000}" th:text="${cart.totalPrice}"></span></strong></td>
+                  </tr>
+                  </tfoot>
+                </table>
+              </div>
+              <div id="coupon">
+                <h3>Apply Coupon</h3>
+                <form th:action="@{/user/add/coupon}" method="get" class="d-flex justify-content-center mb-2">
+                  <div id="error-message" style="display: none; color: red;"></div>
+                 <div id="success-message" style="display: none; color: green;"></div>
+                  <input type="text" maxlength="30" id="couponCode" name="couponCode" class="coupon-placeholder w-50" placeholder="Ex:XEWQAWHYNOMN">
+                  <input type="button" onclick="applyCoupon()" class="w-50 mt-1" style="color: #FFFFFF; background-color: #1d1678" value="Apply Coupon">
+                </form>
+              </div>
+              <div class="payment_method">
+                <div>
+                  <th:block th:each="method : ${paymentMethods}">
+                    <div class="panel-default">
+                      <input type="radio" th:id="${'paymentMethod_' + method}" name="selectedPaymentMethod"
+                             th:value="${method.name()}" />
+                      <label th:for="${'paymentMethod_' + method}" th:text="${method.getDisplayName()}"></label>
+                    </div>
+                  </th:block>
+                </div>
+                <div class="order_button">
+                  <button type="submit">Proceed to buy</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!--Checkout page section end-->
+
+</div>
+
+
+
+<div th:replace="user/fragments/shipping_details :: shipping_details"></div>
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+
+
+<script>
+
+  function applyCoupon() {
+    var couponCode = document.getElementById("couponCode").value;
+
+    // Create a new FormData object
+    var formData = new FormData();
+    formData.append("couponCode", couponCode);
+
+    // Create a new XMLHttpRequest object
+    var xhr = new XMLHttpRequest();
+
+    // Prepare the AJAX request
+    xhr.open("GET", "/user/add/coupon?couponCode=" + encodeURIComponent(couponCode), true);
+
+    // Set up the callback function to handle the response
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status === 200) {
+          // Request was successful, handle the response here
+          var response = JSON.parse(xhr.responseText);
+          if (response.error) {
+            // Display error message to the user
+            showError(response.error);
+          } else {
+            // Coupon applied successfully, update UI or perform other actions
+            showSuccess(response.success);
+            addDiscount(response.couponDiscount)
+
+          }
+        } else {
+          // Request failed or server returned an error
+          console.error("Error applying coupon: " + xhr.status);
+        }
+      }
+    };
+
+    // Send the AJAX request
+    xhr.send(formData);
+  }
+
+  function addDiscount(couponDiscount) {
+
+  }
+
+
+  // Function to display error message
+  function showError(message) {
+    var errorElement = document.getElementById("error-message");
+    errorElement.innerText = message;
+    errorElement.style.display = "block";
+  }
+
+  // Function to display success message
+  function showSuccess(message) {
+    var successElement = document.getElementById("success-message");
+    successElement.innerText = message;
+    successElement.style.display = "block";
+  }
+</script>
+
+</body>
+</html>

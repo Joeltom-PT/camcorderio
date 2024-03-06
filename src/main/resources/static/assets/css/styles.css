@@ -1,0 +1,33 @@
+.pro-price{
+    color: #282a33;
+    font-weight: 600;
+    font-size: large;
+}
+body{
+
+}
+.btn-custom-buy{
+    background-color: #1e3793;
+    color: #FFFFFF;
+}
+.btn-custom-buy:hover{
+    background-color: #192d75;
+    color: #FFFFFF;
+    transition: 200ms;
+}
+.btn-custom-buy:active:link:disabled:checked:enabled{
+    color: #FFFFFF;
+}
+
+.coupon-card{
+    border: 3px solid rgba(100, 149, 237, 0.76);
+    border-radius: 5px;
+    box-shadow: inset 0px 0px 3px #6495ed;
+}
+.coupon-area{
+    background: rgb(74, 255, 234);
+    background: linear-gradient(90deg, rgba(183, 74, 255, 0.44) 0%, rgba(9, 9, 121, 0.33) 45%, rgba(0, 212, 255, 0.45) 100%);
+    border-right: 5px dashed darkblue;
+    border-left: 8px solid darkblue;
+    color: darkblue;
+}

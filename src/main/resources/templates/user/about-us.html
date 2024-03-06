@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{fragments/layout}">
+<head th:replace="user/fragments/head :: head"></head>
+<head>
+    <title>Camcorderio - About us</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/custom.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Graduate&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div th:replace="user/fragments/navbar :: navbar"></div>
+
+
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li>About Us</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+
+      <section>
+          <div class="container mt-5 mb-5" style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
+              <div class="row">
+                  <div class="col-md-12">
+                      <h2 style="color: #333; font-size: 24px; font-weight: bold; margin-bottom: 20px;">About Us</h2>
+                      <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
+                          This project is a demonstration of my skills and expertise in developing eCommerce platforms using Spring Boot.
+                      </p>
+                      <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
+                          The focus of this project is on creating a user-friendly platform where users can explore the latest drone models, innovative camera equipment, and exciting accessories.
+                      </p>
+                      <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
+                          Thank you for visiting this project! If you have any questions or feedback, feel free to contact me.
+                      </p>
+                      <p style="color: #666; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">Connect with me:</p>
+                      <ul style="list-style: none; padding: 0; margin: 0;">
+                          <li style="margin-bottom: 10px;"><a href="https://www.linkedin.com/in/joeltom-p-t-14a442281/"  style="color: #0077b5; text-decoration: none;">LinkedIn</a></li>
+                          <li style="margin-bottom: 10px;"><a href="https://github.com/Joeltom-PT" style="color: #333; text-decoration: none;">GitHub</a></li>
+                          <li style="margin-bottom: 10px;"><a href="/contact-us" style="color: #333; text-decoration: none;">Contact Us</a></li>
+                      </ul>
+                      <p style="color: #666; font-size: 16px; line-height: 1.6; margin-top: 20px;">
+                          Special thanks to <a href="https://www.linkedin.com/in/vivek-v2000/" style="text-decoration: underline">Vivek</a> for their invaluable support.
+                      </p>
+                  </div>
+              </div>
+          </div>
+
+
+
+
+      </section>
+
+
+</div>
+
+
+
+
+<div th:replace="user/fragments/footer :: footer"></div>
+
+<div th:replace="user/fragments/script :: script"></div>
+</body>
+</html>
